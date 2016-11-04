@@ -51,7 +51,7 @@ public class Source
 		}
 		
 		//At end of line?
-		else if (currentPos == -1 || (currentPos == line.length())) {
+		else if ((currentPos == -1) || (currentPos == line.length())) {
 			return EOL;
 		}
 		
