@@ -117,7 +117,7 @@ public class Source
 	 * @return the current line number
 	 * @throws Exception if an error occurred
 	 */
-	public int getLineNum()
+	protected int getLineNum()
 		throws Exception	
 	{
 		return lineNum;
@@ -128,7 +128,7 @@ public class Source
 	 * @return the current position
 	 * @throws Exception if an error occurred
 	 */
-	public int getPosition()
+	protected int getPosition()
 		throws Exception	
 	{
 		return currentPos;
