@@ -80,9 +80,7 @@ public class Source
 	}
 	
 	/**
-	 * Return the source character following the current
-	 * character without consuming the
-	 * current character
+	 * Return the source character following the current character without consuming the current character
 	 * @return the following character.
 	 * @thrown Exception if an error occurred.
 	 */
@@ -112,6 +110,28 @@ public class Source
 			++lineNum;
 		}
 		
+	}
+	
+	/**
+	 * Return the source line number
+	 * @return the current line number
+	 * @throws Exception if an error occurred
+	 */
+	public int getLineNum()
+		throws Exception	
+	{
+		return lineNum;
+	}
+	
+	/**
+	 * Return the current position on the line
+	 * @return the current position
+	 * @throws Exception if an error occurred
+	 */
+	public int getPosition()
+		throws Exception	
+	{
+		return currentPos;
 	}
 	
 	/**
