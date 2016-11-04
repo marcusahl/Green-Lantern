@@ -37,7 +37,7 @@ public class Source
 	 * @throws Exception if an error occurred.
 	 */
 	public char currentChar()
-			throws Exception
+		throws Exception
 	{
 		// First time?
 		if (currentPos == -2) {
