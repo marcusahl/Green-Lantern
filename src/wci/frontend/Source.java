@@ -111,29 +111,7 @@ public class Source
 		}
 		
 	}
-	
-	/**
-	 * Return the source line number
-	 * @return the current line number
-	 * @throws Exception if an error occurred
-	 */
-	public int getLineNum()
-		throws Exception	
-	{
-		return lineNum;
-	}
-	
-	/**
-	 * Return the current position on the line
-	 * @return the current position
-	 * @throws Exception if an error occurred
-	 */
-	public int getPosition()
-		throws Exception	
-	{
-		return currentPos;
-	}
-	
+
 	/**
 	 * Close the source.
 	 * @throws Exception if an error occurred
