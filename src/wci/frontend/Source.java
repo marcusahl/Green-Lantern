@@ -46,7 +46,7 @@ public class Source
 		}
 		
 		// At end of file?
-		else if (line ==null) {
+		else if (line == null) {
 			return EOF;
 		}
 		
@@ -106,7 +106,7 @@ public class Source
 		throws Exception
 	{
 		line = reader.readLine(); 		// null when at the end of the source
-		currentPos = 1;
+		currentPos = -1;
 		
 		if (line != null) {
 			++lineNum;
