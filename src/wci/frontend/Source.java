@@ -2,11 +2,7 @@ package wci.frontend;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import wci.message.MessageProducer;
-import wci.message.MessageHandler;
-import wci.message.MessageListener;
-import wci.message.Message;
-import wci.message.MessageType;
+import wci.message.*;
 
 
 /**

@@ -26,10 +26,8 @@ public class Message {
 	/**
 	 * Returns the message type.
 	 * @return type the message type.
-	 * @throws Exception if an error occurred.
 	 */
 	public MessageType getType()
-		throws Exception
 	{
 		return type;
 	}
@@ -37,10 +35,8 @@ public class Message {
 	/**
 	 * Returns the message body.
 	 * @return body the message body.
-	 * @throws Exception if an error occurred.
 	 */
 	public Object getBody()
-		throws Exception
 	{
 		return body;
 	}

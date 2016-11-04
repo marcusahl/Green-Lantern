@@ -1,13 +1,13 @@
 package wci.frontend;
 
-public class EoFToken extends Token {
+public class EofToken extends Token {
 
 	/**
 	 * Constructor
 	 * @param source the source from where to fetch the token's characters.
 	 * @throws Exception if an error occurred.
 	 */
-	public EoFToken(Source source) 
+	public EofToken(Source source) 
 		throws Exception 
 	{
 		super(source);
