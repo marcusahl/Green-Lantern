@@ -8,7 +8,7 @@ package wci.frontend;
  * implemented by language-specific subclasses </p>
  */
 
-public abstract class Scanner 
+public abstract class Scanner
 {
 	protected Source source;
 	protected Token currentToken;
@@ -43,8 +43,7 @@ public abstract class Scanner
 	}
 	
 	/**
-	 * Do the actual work of extracting and returning the next
-	 * token from the source. Implemented by scanner subclasses.
+	 * Do the actual work of extracting and returning the next token from the source. Implemented by scanner subclasses.
 	 * @return the next token
 	 * @throws Exception if an error occurred
 	 */

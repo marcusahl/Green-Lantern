@@ -2,13 +2,19 @@ package wci.frontend;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import wci.message.MessageProducer;
+import wci.message.MessageHandler;
+import wci.message.MessageListener;
+import wci.message.Message;
+import wci.message.MessageType;
+
 
 /**
  * <h1>Source</h1>
  * 
  * <p>The Framework class that represents the source program</p>
   */
-public class Source 
+public class Source implements MessageProducer
 {
 	public static final char EOL = '\n';
 	public static final char EOF = (char) 0;
@@ -17,6 +23,8 @@ public class Source
 	private String line;
 	private int lineNum;
 	private int currentPos;
+	
+	protected static MessageHandler messageHandler; // message handler delegate
 	
 	/**
 	 * Constructor.
@@ -101,13 +109,20 @@ public class Source
 	 * @throws IOException if an I/O error occurred.
 	 */
 	private void readLine()
-		throws Exception
+		throws IOException
 	{
 		line = reader.readLine(); 		// null when at the end of the source
-		currentPos = -1;
+		currentPos = 0;
 		
 		if (line != null) {
 			++lineNum;
+		}
+		
+		//Send a source line message containing the line number
+		// and the line text to all the listeners.
+		if (line != null) 
+		{
+			sendMessage(new Message(SOURCE_LINE, new Object[] {lineNum, line}));
 		}
 		
 	}
@@ -132,6 +147,33 @@ public class Source
 		throws Exception	
 	{
 		return currentPos;
+	}
+	
+	/**
+	 * Add a parser message listener
+	 * @param listener the message listener to add
+	 */
+	public void addMessageListener(MessageListener listener)
+	{
+		messageHandler.addListener(listener);
+	}
+	
+	/**
+	 * Remove a parser message listener
+	 * @param listener the message listener to remove
+	 */
+	public void removeMessageListener(MessageListener listener)
+	{
+		messageHandler.removeListener(listener);
+	}
+	
+	/**
+	 * Notify a listener after setting the message
+	 * @param message the message to set
+	 */
+	public void sendMessage(Message message)
+	{
+		messageHandler.sendMessage(message);
 	}
 	
 	/**

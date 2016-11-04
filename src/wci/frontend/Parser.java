@@ -2,6 +2,11 @@ package wci.frontend;
 
 import wci.intermediate.Icode;
 import wci.intermediate.SymTab;
+import wci.message.MessageProducer;
+import wci.message.MessageHandler;
+import wci.message.MessageListener;
+import wci.message.Message;
+
 
 /**
  * 
@@ -13,12 +18,14 @@ import wci.intermediate.SymTab;
  *
  */
 
-public abstract class Parser {
+public abstract class Parser implements MessageProducer{
 
-	protected static Symtab symtab; 	// generated symbol table 
+	protected static Symtab symTab; 	// generated symbol table 
+	protected static MessageHandler messageHandler; // message handler delegate
 	
 	static {
 		symTab = null;
+		messageHandler = new MessageHandler();
 	}
 	
 	protected Scanner scanner; 	// scanner used with this parser
@@ -59,7 +66,8 @@ public abstract class Parser {
 		return scanner.currentToken();
 	}
 	
-	/**Call the scanner's nextToken() method.
+	/**
+	 * Call the scanner's nextToken() method.
 	 * @return the next token.
 	 * @throws Exception if an error occurred	
 	 */
@@ -68,5 +76,33 @@ public abstract class Parser {
 	{
 		return scanner.nextToken();
 	}
+	
+	/**
+	 * Add a parser message listener
+	 * @param listener the message listener to add
+	 */
+	public void addMessageListener(MessageListener listener)
+	{
+		messageHandler.addListener(listener);
+	}
+	
+	/**
+	 * Remove a parser message listener
+	 * @param listener the message listener to remove
+	 */
+	public void removeMessageListener(MessageListener listener)
+	{
+		messageHandler.removeListener(listener);
+	}
+	
+	/**
+	 * Notify a listener after setting the message
+	 * @param message the message to set
+	 */
+	public void sendMessage(Message message)
+	{
+		messageHandler.sendMessage(message);
+	}
+	
 }
 
