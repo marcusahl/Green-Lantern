@@ -69,7 +69,43 @@ public class Pascal {
 	 */
 	public static void main(String[] args) 
 	{
+		try
+		{
+			String operation = args[0];
+			
+			// Operation.
+			if (!(   operation.equalsIgnoreCase("compile")
+					|| operation.equalsIgnoreCase("execute")))
+			{
+				throw new Exception();
+			}
+			
+			int i = 0;
+			String flags = "";
+			
+			//Flags
+			while ((++i < args.length) && (args[i].charAt(0) == '-'))
+			{
+				flags += args[i].substring(1);
+			}
+			
+			// Source path
+			if (i < args.length)
+			{
+				String path = args[i];
+				new Pascal(operation, path, flags);
+			}
+			else
+			{
+				throw new Exception();
+			}
+			
+		}
 		
+		catch (Exception ex)
+		{
+			System.out.println(USAGE);
+		}
 	}
 	
 	private static final String SOURCE_LINE_FORMAT = "%03d %s";

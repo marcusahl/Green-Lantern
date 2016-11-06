@@ -1,6 +1,7 @@
 package wci.message;
 
 import java.util.ArrayList;
+import wci.message.*;
 
 /**
  * <h1>MessageHandler</h1>
