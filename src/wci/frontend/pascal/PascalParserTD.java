@@ -3,6 +3,9 @@ package wci.frontend.pascal;
 import wci.frontend.*;
 import wci.message.Message;
 
+import static wci.message.MessageType.*;
+
+
 /**
  * <h1>PascalParserTD</h1>
  * 

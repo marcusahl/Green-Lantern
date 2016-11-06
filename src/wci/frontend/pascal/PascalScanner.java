@@ -1,7 +1,9 @@
 package wci.frontend.pascal;
 
 import wci.frontend.*;
+
 import static wci.frontend.Source.EOF;
+
 
 /**
  * <h1>PascalScanner</h1>
@@ -28,11 +30,11 @@ public class PascalScanner extends Scanner {
 		throws Exception 
 	{
 		Token token;
-		char currentChar = curentChar();
+		char currentChar = currentChar();
 		
 		// Construct the next token. The current character determines the
 		/// token type.
-		if (currentChar = EOF) 
+		if (currentChar == EOF) 
 		{
 			token = new EofToken(source);
 		}

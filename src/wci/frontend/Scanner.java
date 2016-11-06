@@ -43,7 +43,8 @@ public abstract class Scanner
 	}
 	
 	/**
-	 * Do the actual work of extracting and returning the next token from the source. Implemented by scanner subclasses.
+	 * Do the actual work of extracting and returning the next token from the source. 
+	 * Implemented by scanner subclasses.
 	 * @return the next token
 	 * @throws Exception if an error occurred
 	 */
