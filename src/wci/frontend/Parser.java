@@ -104,5 +104,32 @@ public abstract class Parser implements MessageProducer{
 		messageHandler.sendMessage(message);
 	}
 	
+	/**
+	 * 
+	 * @return messageHandler.
+	 */
+	public MessageHandler getMessageHandler()
+	{
+		return messageHandler;
+	}
+	
+	/**
+	 * 
+	 * @return iCode.
+	 */
+	public ICode getICode()
+	{
+		return iCode;
+	}
+	
+	/**
+	 * 
+	 * @return symTab.
+	 */
+	public SymTab getSymTab()
+	{
+		return symTab;
+	}
+	
 }
 
