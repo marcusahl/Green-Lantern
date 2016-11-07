@@ -10,5 +10,5 @@ This project of mine uses the designs, lessons, skills and tips by Ronald Mak's 
 ## Using the compiler
 To run the Pascal compiler issue the command
 ```
-java -classpath bin Pascal execute|compile hello.pas
+java -classpath bin Pascal [execute|compile] hello.pas
 ```
