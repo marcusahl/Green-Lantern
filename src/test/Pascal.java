@@ -19,7 +19,7 @@ public class Pascal {
 	private Source source; // language-independent source.
 	private ICode iCode; // generated intermediate code.
 	private SymTab symTab; // generated symbol table.
-	private Backend backend; // backend.
+	private Backend backend; // back end.
 
 	/**
 	 * Compile or interpret a Pascal source program.
@@ -112,7 +112,7 @@ public class Pascal {
 	
 	private class SourceMessageListener implements MessageListener	
 	{
-
+		public SourceMessageListener() {};
 		/**
 		 * Called by the source whenever it produces a message
 		 * @param message the message.
@@ -130,18 +130,22 @@ public class Pascal {
 					int lineNumber = (Integer) body[0];
 					String lineText = (String) body[1];
 					
-					System.out.printf(SOURCE_LINE_FORMAT, lineNumber, lineText);
+					// We use system.out.println(String.format()) over system.out.printf() here
+					// to get each line of the source code printed on a seperate line
+					
+					System.out.println(String.format(SOURCE_LINE_FORMAT, lineNumber, lineText));
 					
 					break;
 				}
+
 			}
 		}
 	}
 	
 	private static final String PARSER_SUMMARY_FORMAT = 
-			"\n%,20d source lines." +
-			"\n%, 20d syntax errors." +
-			"\n%, 20.2f seconds total parsing time.\n";
+			"\n%,20d source lines." + 
+			"\n%,20d syntax errors." + 
+			"\n%,20.2f seconds total parsing time.\n";
 	
 	private class ParserMessageListener implements MessageListener
 	{
@@ -173,13 +177,13 @@ public class Pascal {
 	}
 	
 	private static final String INTERPRETER_SUMMARY_FORMAT = 
-			"\n%, 20d statements exectued." +
-			"\n%, 20d runtime errors" + 
-			"\n%, 20.2f seconds total execution time.\n";
+			"\n%,20d statements exectued." + 
+			"\n%,20d runtime errors" + 
+			"\n%,20.2f seconds total execution time.\n";
 	
 	private static final String COMPILER_SUMMARY_FORMAT =
-			"\n, 20d instructions generated." +
-			"\n, 20.2f seconds total code generation time.\n";
+			"\n%,20d instructions generated." + 
+			"\n%,20.2f seconds total code generation time.\n";
 	
 	private class BackendMessageListener implements MessageListener
 	{

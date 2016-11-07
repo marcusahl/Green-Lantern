@@ -25,7 +25,7 @@ public class CodeGenerator extends Backend {
 		throws Exception 
 	{
 		long startTime = System.currentTimeMillis();
-		float elapsedTime = (System.currentTimeMillis()-startTime/1000f);
+		float elapsedTime = ((System.currentTimeMillis()-startTime)/1000f);
 		int instructionCount = 0;
 		
 		//Send the compiler summary message

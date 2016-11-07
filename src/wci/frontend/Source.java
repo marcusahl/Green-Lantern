@@ -22,7 +22,7 @@ public class Source implements MessageProducer
 	private int lineNum;
 	private int currentPos;
 	
-	protected static MessageHandler messageHandler; // message handler delegate
+	protected static MessageHandler messageHandler = new MessageHandler(); // message handler delegate
 	
 	/**
 	 * Constructor.
