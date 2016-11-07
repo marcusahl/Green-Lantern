@@ -110,7 +110,7 @@ public class Source implements MessageProducer
 		throws IOException
 	{
 		line = reader.readLine(); 		// null when at the end of the source
-		currentPos = 0;
+		currentPos = -1;
 		
 		if (line != null) {
 			++lineNum;

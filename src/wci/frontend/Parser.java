@@ -105,7 +105,7 @@ public abstract class Parser implements MessageProducer{
 	}
 	
 	/**
-	 * 
+	 * Getter method
 	 * @return messageHandler.
 	 */
 	public MessageHandler getMessageHandler()
@@ -114,7 +114,7 @@ public abstract class Parser implements MessageProducer{
 	}
 	
 	/**
-	 * 
+	 * Getter method
 	 * @return iCode.
 	 */
 	public ICode getICode()
@@ -123,7 +123,7 @@ public abstract class Parser implements MessageProducer{
 	}
 	
 	/**
-	 * 
+	 * Getter method
 	 * @return symTab.
 	 */
 	public SymTab getSymTab()
