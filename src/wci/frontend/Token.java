@@ -90,4 +90,17 @@ public class Token
 		return position;
 	}
 
+	public TokenType getType() 
+	{
+		return type;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public Object getValue() {
+		return value;
+	}
+
 }
