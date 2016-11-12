@@ -1,6 +1,7 @@
 package wci.frontend.pascal;
 
 import wci.frontend.*;
+import wci.intermediate.*;
 import wci.message.Message;
 
 import static wci.message.MessageType.*;
@@ -37,20 +38,32 @@ public class PascalParserTD extends Parser {
 		
 		try
 		{
+			// Loop over each token until end of file
 			while (!((token = nextToken()) instanceof EofToken)) 
 			{
 				TokenType tokenType = token.getType();
 				
-				if (tokenType != ERROR)
+				// Cross references only the identifiers
+				
+				if (tokenType == IDENTIFIER)
 				{
+					String name = token.getText().toLowerCase();
 					
-					//Format each token
-					sendMessage(new Message(TOKEN, new Object[] {token.getLineNumber(), 
-							token.getPosition(), tokenType, 
-							token.getText(), token.getValue()}));
+					// If not already in the symbol table,
+					// create a new entry and enter into the table
+					
+					SymTabEntry entry = symTabStack.lookup(name);
+					if (entry == null)
+					{
+						entry = symTabStack.enterLocal(name);
+					}
+					
+					// Append the current line number to the entry.
+					entry.appendLineNumber(token.getLineNumber());
 					
 				}
-				else 
+				
+				else if (tokenType == ERROR)
 				{
 					errorHandler.flag(token, (PascalErrorCode) token.getValue(), this);
 				}

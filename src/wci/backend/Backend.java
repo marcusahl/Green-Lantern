@@ -1,7 +1,6 @@
 package wci.backend;
 
-import wci.intermediate.ICode;
-import wci.intermediate.SymTab;
+import wci.intermediate.*;
 import wci.message.*;
 
 /**
@@ -19,7 +18,7 @@ public abstract class Backend implements MessageProducer
 		messageHandler = new MessageHandler();
 	}
 	
-	protected SymTab symTab;
+	protected SymTabStack symTabStack;
 	protected ICode iCode;
 	
 	@Override
@@ -50,7 +49,7 @@ public abstract class Backend implements MessageProducer
 	 * @param symTab the symbol table.
 	 * @throws Exception if an error occurred.
 	 */
-	public abstract void process(ICode iCode, SymTab symTab)
+	public abstract void process(ICode iCode, SymTabStack symTabStack)
 		throws Exception;
 	
 	/**
@@ -75,9 +74,9 @@ public abstract class Backend implements MessageProducer
 	 * 
 	 * @return symTab.
 	 */
-	public SymTab getSymTab()
+	public SymTabStack getSymTabStack()
 	{
-		return symTab;
+		return symTabStack;
 	}
 
 }

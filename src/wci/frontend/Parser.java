@@ -1,7 +1,6 @@
 package wci.frontend;
 
-import wci.intermediate.ICode;
-import wci.intermediate.SymTab;
+import wci.intermediate.*;
 import wci.message.MessageProducer;
 import wci.message.MessageHandler;
 import wci.message.MessageListener;
@@ -20,11 +19,11 @@ import wci.message.Message;
 
 public abstract class Parser implements MessageProducer{
 
-	protected static SymTab symTab; 	// generated symbol table 
+	protected static SymTabStack symTabStack; 	// symbol table stack
 	protected static MessageHandler messageHandler; // message handler delegate
 	
 	static {
-		symTab = null;
+		symTabStack = SymTabFactory.createSymTabStack();
 		messageHandler = new MessageHandler();
 	}
 	
@@ -126,9 +125,10 @@ public abstract class Parser implements MessageProducer{
 	 * Getter method
 	 * @return symTab.
 	 */
-	public SymTab getSymTab()
+	
+	public SymTabStack getSymTabStack()
 	{
-		return symTab;
+		return symTabStack;
 	}
 	
 }
