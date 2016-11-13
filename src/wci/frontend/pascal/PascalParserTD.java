@@ -1,12 +1,17 @@
 package wci.frontend.pascal;
 
-import wci.frontend.*;
-import wci.intermediate.*;
-import wci.message.Message;
-
-import static wci.message.MessageType.*;
-import static wci.frontend.pascal.PascalTokenType.*;
 import static wci.frontend.pascal.PascalErrorCode.*;
+import static wci.frontend.pascal.PascalTokenType.*;
+import static wci.frontend.pascal.PascalTokenType.*;
+import static wci.message.MessageType.*;
+
+import wci.frontend.Parser;
+import wci.frontend.Scanner;
+import wci.frontend.Token;
+import wci.frontend.pascal.parsers.*;
+import wci.intermediate.ICodeFactory;
+import wci.intermediate.ICodeNode;
+import wci.message.Message;
 
 
 /**
@@ -24,6 +29,15 @@ public class PascalParserTD extends Parser {
 	{
 		super(scanner);
 	}
+	
+	/**
+	 * Constructor for subclasses.
+	 * @param parent the parent parser.
+	 */
+	public PascalParserTD(PascalParserTD parent)
+	{
+		super(parent.getScanner());
+	}
 
 	protected static PascalErrorHandler errorHandler = new PascalErrorHandler();
 	
@@ -33,41 +47,38 @@ public class PascalParserTD extends Parser {
 	public void parse() 
 		throws Exception 
 	{
-		Token token;
 		long startTime = System.currentTimeMillis();
+		iCode = ICodeFactory.createICode();
 		
 		try
 		{
-			// Loop over each token until end of file
-			while (!((token = nextToken()) instanceof EofToken)) 
+			Token token = nextToken();
+			ICodeNode rootNode = null;
+			
+			
+			//	Look for the BEGIN token to parse a compound statement.
+			if (token.getType() == BEGIN)
 			{
-				TokenType tokenType = token.getType();
-				
-				// Cross references only the identifiers
-				
-				if (tokenType == IDENTIFIER)
-				{
-					String name = token.getText().toLowerCase();
-					
-					// If not already in the symbol table,
-					// create a new entry and enter into the table
-					
-					SymTabEntry entry = symTabStack.lookup(name);
-					if (entry == null)
-					{
-						entry = symTabStack.enterLocal(name);
-					}
-					
-					// Append the current line number to the entry.
-					entry.appendLineNumber(token.getLineNumber());
-					
-				}
-				
-				else if (tokenType == ERROR)
-				{
-					errorHandler.flag(token, (PascalErrorCode) token.getValue(), this);
-				}
-				
+				StatementParser statementParser = new StatementParser(this);
+				rootNode = statementParser.parse(token);
+				token = currentToken();
+			}
+			else 
+			{
+				errorHandler.flag(token, UNEXPECTED_TOKEN, this);
+			}
+			
+			// Look for the final period.
+			if (token.getType() != DOT)
+			{
+				errorHandler.flag(token, MISSING_PERIOD, this);
+			}
+			token = currentToken();
+			
+			//	Set the parse tree root node.
+			if (rootNode != null)
+			{
+				iCode.setRoot(rootNode);
 			}
 			
 			//Send the parser summary message.
@@ -90,6 +101,15 @@ public class PascalParserTD extends Parser {
 	public int getErrorCount() 
 	{
 		return errorHandler.getErrorCount();
+	}
+	
+	/**
+	 * Getter
+	 * @return the scanner.
+	 */
+	public Scanner getScanner()
+	{
+		return scanner;
 	}
 
 }

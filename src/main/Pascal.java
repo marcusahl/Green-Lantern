@@ -33,8 +33,8 @@ public class Pascal {
 	{
 		try
 		{
-			boolean intermediate = flags.indexOf('i') > -1; // for future use
-			boolean xref		 = flags.indexOf('x') > -1; // for future use
+			boolean intermediate = flags.indexOf('i') > -1; 
+			boolean xref		 = flags.indexOf('x') > -1; 
 			
 			source = new Source(new BufferedReader(new FileReader(filePath)));
 			source.addMessageListener(new SourceMessageListener());
@@ -55,6 +55,13 @@ public class Pascal {
 			{
 				CrossReferencer crossReferencer = new CrossReferencer();
 				crossReferencer.print(symTabStack);
+			}
+			
+			if (intermediate)
+			{
+				ParseTreePrinter treePrinter =
+						new ParseTreePrinter(System.out);
+				treePrinter.print(iCode);
 			}
 			
 			backend.process(iCode, symTabStack);
