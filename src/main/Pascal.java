@@ -263,8 +263,13 @@ public class Pascal {
 			"\n%,20d instructions generated." + 
 			"\n%,20.2f seconds total code generation time.\n";
 	
+	private static final String ASSIGN_FORMAT =
+			" >>> LINE %03d: %s = %s\n";
+	
 	private class BackendMessageListener implements MessageListener
 	{
+		
+		boolean firstOutputMessage = true;
 
 		/**
 		 * Called by the back end whenever it produces a message
@@ -298,6 +303,39 @@ public class Pascal {
 					
 					System.out.printf(COMPILER_SUMMARY_FORMAT, instructionCount, elapsedTime);
 					
+					break;
+				}
+				
+				case ASSIGN:
+				{
+					if (firstOutputMessage)
+					{
+						System.out.println("\n===== OUTPUT =====\n");
+						firstOutputMessage = false;
+					}
+					
+					Object body[] = ((Object[]) message.getBody());
+					int lineNumber = (Integer) body[0];
+					String variableName = (String) body[1];
+					Object value = body[2];
+					
+					System.out.printf(ASSIGN_FORMAT, lineNumber, variableName, value);
+					break;
+					
+				}
+				
+				case RUNTIME_ERROR:
+				{
+					Object body [] = (Object []) message.getBody();
+					String errorMessage = (String) body[0];
+					Integer lineNumber = (Integer) body[1];
+					
+					System.out.print("**** RUNTIME ERROR");
+					if (lineNumber != null)
+					{
+						System.out.print(" AT LINE " + String.format("%03d", lineNumber));
+					}
+					System.out.println(": " + errorMessage);
 					break;
 				}
 			}
