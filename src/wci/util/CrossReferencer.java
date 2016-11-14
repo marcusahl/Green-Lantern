@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import wci.intermediate.*;
 
-import static wci.intermediate.symtabimpl.SymTabEntryImpl.*;
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
 
 /**
  * <h1>CrossReferencer</h1>
