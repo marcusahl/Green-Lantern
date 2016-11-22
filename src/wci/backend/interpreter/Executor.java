@@ -1,6 +1,7 @@
 package wci.backend.interpreter;
 
 import wci.backend.Backend;
+import wci.backend.interpreter.executors.*;
 import wci.intermediate.*;
 import wci.message.Message;
 
@@ -14,8 +15,26 @@ import static wci.message.MessageType.*;
  */
 public class Executor extends Backend {
 
+	protected static int executionCount;
+	protected static RuntimeErrorHandler errorHandler;
+	
+	static
+	{
+		executionCount = 0;
+		errorHandler = new RuntimeErrorHandler();
+	}
+	
 	public Executor() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	/**
+	 * Constructor for subclasses.
+	 * @param parent the parent executor.
+	 */
+	public Executor(Executor parent)
+	{
+		super();
 	}
 
 	
@@ -28,12 +47,20 @@ public class Executor extends Backend {
 	 */
 	public void process(ICode iCode, SymTabStack symTabStack) throws Exception 
 	{
-		long startTime = System.currentTimeMillis();
-		float elapsedTime = ((System.currentTimeMillis()-startTime)/1000f);
-		int executionCount = 0;
-		int runtimeErrors = 0;
+		this.symTabStack = symTabStack;
+		this.iCode = iCode;
 		
-		//Send the compiler summary message
+		long startTime = System.currentTimeMillis();
+		
+		//	Get the root node of the intermediate code and execute.
+		ICodeNode rootNode = iCode.getRoot();
+		StatementExecutor statementExecutor = new StatementExecutor(this);
+		statementExecutor.execute(rootNode);
+		
+		float elapsedTime = ((System.currentTimeMillis()-startTime)/1000f);
+		int runtimeErrors = errorHandler.getErrorCount();
+		
+		//	Send the interpreter summary message
 		sendMessage(new Message(INTERPRETER_SUMMARY, new Number[] {executionCount, runtimeErrors, 
 				elapsedTime}));
 	

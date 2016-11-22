@@ -20,7 +20,12 @@ BEGIN
 	      number := 2;
 	      root := number;
 	      root := (number/root + root)/2;
+      	      root := (number/root + root)/2;
+	      root := (number/root + root)/2;
+	      root := (number/root + root)/2;
+	      root := (number/root + root)/2;	      
 	END;
+
 	ch := 'n';
 	str := 'hello, world'
 	
