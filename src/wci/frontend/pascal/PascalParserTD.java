@@ -1,49 +1,37 @@
 package wci.frontend.pascal;
 
-import static wci.frontend.pascal.PascalErrorCode.*;
-import static wci.frontend.pascal.PascalTokenType.*;
-import static wci.frontend.pascal.PascalTokenType.*;
-import static wci.message.MessageType.*;
+import static wci.frontend.pascal.PascalErrorCode.IO_ERROR;
+import static wci.frontend.pascal.PascalErrorCode.MISSING_PERIOD;
+import static wci.frontend.pascal.PascalErrorCode.UNEXPECTED_TOKEN;
+import static wci.frontend.pascal.PascalTokenType.BEGIN;
+import static wci.frontend.pascal.PascalTokenType.DOT;
+import static wci.message.MessageType.PARSER_SUMMARY;
 
+import java.util.EnumSet;
+
+import wci.frontend.EofToken;
 import wci.frontend.Parser;
 import wci.frontend.Scanner;
 import wci.frontend.Token;
-import wci.frontend.pascal.parsers.*;
+import wci.frontend.pascal.parsers.StatementParser;
 import wci.intermediate.ICodeFactory;
 import wci.intermediate.ICodeNode;
 import wci.message.Message;
 
-
-/**
- * <h1>PascalParserTD</h1>
- * 
- *<p>The top-down Pascal parser.</p>
- */
 public class PascalParserTD extends Parser {
 	
-	/**
-	 * Constructor
-	 * @param scanner the scanner to be used for this parser.
-	 */
+	protected static PascalErrorHandler errorHandler = new PascalErrorHandler();
+	
 	public PascalParserTD(Scanner scanner) 
 	{
 		super(scanner);
 	}
 	
-	/**
-	 * Constructor for subclasses.
-	 * @param parent the parent parser.
-	 */
 	public PascalParserTD(PascalParserTD parent)
 	{
 		super(parent.getScanner());
 	}
-
-	protected static PascalErrorHandler errorHandler = new PascalErrorHandler();
 	
-	/**
-	 * Parse a Pascal source program and generate the symbol table and the intermediate code
-	 */
 	public void parse() 
 		throws Exception 
 	{
@@ -94,19 +82,33 @@ public class PascalParserTD extends Parser {
 
 	}
 
-	/**
-	 * Return the number of syntax errors found by the parser.
-	 * @return the error count
-	 */
+	public Token synchronize(EnumSet syncSet) 
+		throws Exception {
+		
+		Token token = currentToken();
+		
+		// If the current token is not in the synchronization
+		// set, then it is unexpected and the parser must recover
+		if (!syncSet.contains(token.getType())) {
+			errorHandler.flag(token, UNEXPECTED_TOKEN, this);
+			
+			// We recover by skipping until we find a token
+			// in the synchronization set
+			do {
+				token = nextToken();
+			} while (!(token instanceof EofToken) &&
+					!syncSet.contains(token.getType()));
+		}
+		
+		return token;
+		
+	}
+	
 	public int getErrorCount() 
 	{
 		return errorHandler.getErrorCount();
 	}
 	
-	/**
-	 * Getter
-	 * @return the scanner.
-	 */
 	public Scanner getScanner()
 	{
 		return scanner;

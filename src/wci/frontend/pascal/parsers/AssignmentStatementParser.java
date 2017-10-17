@@ -1,17 +1,31 @@
 package wci.frontend.pascal.parsers;
 
-import wci.frontend.pascal.*;
-import wci.frontend.*;
-import wci.intermediate.*;
+import static wci.frontend.pascal.PascalErrorCode.MISSING_COLON_EQUALS;
+import static wci.frontend.pascal.PascalTokenType.COLON_EQUALS;
+import static wci.intermediate.icodeimpl.ICodeKeyImpl.ID;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.ASSIGN;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.VARIABLE;
 
-import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.*;
-import static wci.frontend.pascal.PascalTokenType.*;
-import static wci.frontend.pascal.PascalErrorCode.*;
-import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
+import java.util.EnumSet;
+
+import wci.frontend.Token;
+import wci.frontend.pascal.PascalParserTD;
+import wci.frontend.pascal.PascalTokenType;
+import wci.intermediate.ICodeFactory;
+import wci.intermediate.ICodeNode;
+import wci.intermediate.SymTabEntry;
 
 
 public class AssignmentStatementParser extends StatementParser 
 {
+	
+	private static final EnumSet<PascalTokenType> COLON_EQUALS_SET = 
+			ExpressionParser.EXPR_START_SET.clone();
+	
+	static {
+		COLON_EQUALS_SET.add(COLON_EQUALS);
+		COLON_EQUALS_SET.addAll(StatementParser.STMT_FOLLOW_SET);
+	}
 
 	public AssignmentStatementParser(PascalParserTD parent) 
 	{
@@ -19,12 +33,6 @@ public class AssignmentStatementParser extends StatementParser
 	}
 	
 	
-	/**
-	 * Parses the assignment statement
-	 * @param token the assignment token.
-	 * @return the root node of the generated parse tree.
-	 * @throws Exception if an error occurred.
-	 */
 	public ICodeNode parse(Token token)
 		throws Exception
 	{
@@ -41,19 +49,22 @@ public class AssignmentStatementParser extends StatementParser
 		}
 		targetId.appendLineNumber(token.getLineNumber());
 		
-		token = nextToken();					//	consume the identifier class
+		// consume the identifier class
+		token = nextToken();	
 		
 		//	Create the variable node and get its name attribute.
 		ICodeNode variableNode = ICodeFactory.createICodeNode(VARIABLE);
 		variableNode.setAttribute(ID, targetId);
 		
-		//	The ASSIGN node adopts the variable node as its first child.
+		// The ASSIGN node adopts the variable node as its first child.
 		assignNode.addChild(variableNode);
 		
-		// Look for the := token
+		// Synchronize on the := token
+		token = synchronize(COLON_EQUALS_SET);
 		if (token.getType() == COLON_EQUALS)
 		{
-			token = nextToken();					// consume the :=
+			// consume the :=
+			token = nextToken();	
 		}
 		else
 		{

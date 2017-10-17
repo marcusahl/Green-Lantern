@@ -16,18 +16,17 @@ import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
 
 public class ExpressionParser extends StatementParser 
 {
+	
+	// Synchronization set for starting an expression
+	static final EnumSet<PascalTokenType> EXPR_START_SET =
+			EnumSet.of(PLUS, MINUS, IDENTIFIER, INTEGER, REAL, STRING, 
+					PascalTokenType.NOT, LEFT_PAREN);
 
 	public ExpressionParser(PascalParserTD parent) 
 	{
 		super(parent);
 	}
 	
-	/**
-	 * Parses the expression
-	 * @param token the assignment token.
-	 * @return the root node of the generated parse tree.
-	 * @throws Exception if an error occurred.
-	 */
 	public ICodeNode parse(Token token)
 		throws Exception
 	{
@@ -52,12 +51,6 @@ public class ExpressionParser extends StatementParser
 		REL_OPS_MAP.put(GREATER_EQUALS, GE);
 	};
 	
-	/**
-	 * Parse an expression
-	 * @param token the initial token.
-	 * @return the root node of the generated parse tree.
-	 * @throws Exception if an error occurred.
-	 */
 	private ICodeNode parseExpression(Token token)
 		throws Exception
 	{
@@ -103,12 +96,6 @@ public class ExpressionParser extends StatementParser
 		ADD_OPS_OPS_MAP.put(PascalTokenType.OR, ICodeNodeTypeImpl.OR);
 	};
 	
-	/**
-	 * Parse a simple expression
-	 * @param token the initial token.
-	 * @return the root node of the generated parser tree.
-	 * @throws Exception if an error occurred.
-	 */
 	private ICodeNode parseSimpleExpression(Token token)
 		throws Exception
 	{
@@ -178,12 +165,6 @@ public class ExpressionParser extends StatementParser
 		MULT_OPS_OPS_MAP.put(PascalTokenType.AND, ICodeNodeTypeImpl.AND);
 	};
 			
-	/**
-	 * Parse a term.
-	 * @param token the initial token.
-	 * @return the root of the generated parse subtree.
-	 * @throws Exception if an error occurred.
-	 */
 	private ICodeNode parseTerm(Token token)
 		throws Exception
 	{
@@ -218,12 +199,6 @@ public class ExpressionParser extends StatementParser
 		return rootNode;
 	}
 	
-	/**
-	 * Parse a factor.
-	 * @param token the initial token.
-	 * @return the root node.
-	 * @throws Exception if an error occurred.
-	 */
 	private ICodeNode parseFactor(Token token)
 		throws Exception
 	{
