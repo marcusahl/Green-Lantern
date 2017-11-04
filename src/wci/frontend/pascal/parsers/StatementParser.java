@@ -75,7 +75,7 @@ public class StatementParser extends PascalParserTD
 				break;
 			}
 			
-			/* case IF:
+			case IF: 
 			{
 				IfStatementParser ifParser = new IfStatementParser(this);
 				statementNode = ifParser.parse(token);
@@ -87,7 +87,7 @@ public class StatementParser extends PascalParserTD
 				CaseStatementParser caseParser = new CaseStatementParser(this);
 				statementNode = caseParser.parse(token);
 				break;
-			} */
+			} 
 			
 			default:
 			{
