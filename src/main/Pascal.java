@@ -11,11 +11,6 @@ import wci.util.*;
 import static wci.message.MessageType.*;
 import static wci.frontend.pascal.PascalTokenType.*;
 
-/**
- * <h1>Pascal</p>
- * 
- *<p>Compile or interpret a Pascal source program</p>
- */
 public class Pascal {
 	private Parser parser; // language-independent parser.
 	private Source source; // language-independent source.
@@ -23,12 +18,6 @@ public class Pascal {
 	private SymTabStack symTabStack; // generated symbol table.
 	private Backend backend; // back end.
 
-	/**
-	 * Compile or interpret a Pascal source program.
-	 * @param operation
-	 * @param filePath
-	 * @param flags
-	 */
 	public Pascal(String operation, String filePath, String flags) 
 	{
 		try
@@ -77,11 +66,6 @@ public class Pascal {
 	private static final String FLAGS = "[-ix]";
 	private static final String USAGE = "Usage: Pascal execute|comiple " + FLAGS + " <source file path> ";
 
-	/**
-	 * The main method.
-	 * @param args command-line arguments: "compile" or "execute" followed by
-	 * optional flags followed by the source file path.
-	 */
 	public static void main(String[] args) 
 	{
 		try
@@ -128,10 +112,6 @@ public class Pascal {
 	private class SourceMessageListener implements MessageListener	
 	{
 		public SourceMessageListener() {};
-		/**
-		 * Called by the source whenever it produces a message
-		 * @param message the message.
-		 */
 		public void messageReceived(Message message) 
 		{
 			MessageType type = message.getType();
@@ -167,16 +147,9 @@ public class Pascal {
 			">>> 			value=%s";
 	private static final int PREFIX_WIDTH = 5;
 	
-	/**
-	 *	Listener for the parser messages.
-	 */
 	private class ParserMessageListener implements MessageListener
 	{
 
-		/**
-		 * Called by the parser whenever it produces a message
-		 * @param message the message.
-		 */
 		public void messageReceived(Message message) 
 		{
 			MessageType type = message.getType();
@@ -270,11 +243,6 @@ public class Pascal {
 	{
 		
 		boolean firstOutputMessage = true;
-
-		/**
-		 * Called by the back end whenever it produces a message
-		 * @param message the message
-		 */
 		public void messageReceived(Message message) 
 		{
 			MessageType type = message.getType();

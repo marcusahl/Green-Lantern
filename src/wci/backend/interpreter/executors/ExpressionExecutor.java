@@ -18,10 +18,6 @@ import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
 public class ExpressionExecutor extends StatementExecutor 
 {
 
-	/**
-	 * Constructor.
-	 * @param parent the parent executor.
-	 */
 	public ExpressionExecutor(Executor parent) 
 	{
 		super(parent);
@@ -99,19 +95,13 @@ public class ExpressionExecutor extends StatementExecutor
 	private static final EnumSet<ICodeNodeTypeImpl> ARITH_OPS =
 			EnumSet.of(ADD, SUBTRACT, MULTIPLY, FLOAT_DIVIDE, INTEGER_DIVIDE);
 	
-	/**
-	 * Execute the binary operator.
-	 * @param node the root node of the expression.
-	 * @param nodeType the node type
-	 * @return the compound value of the expression.
-	 */
 	private Object executeBinaryOperator(ICodeNode node, ICodeNodeTypeImpl nodeType)
 	{
 		//	Get the two operand children of the operator node.
 		List<ICodeNode> children = node.getChildren();
 		ICodeNode operandNode1 = children.get(0);
-		ICodeNode operandNode2 = children.get(1);
-		
+		ICodeNode operandNode2 = children.get(1); // BUG when running a loop executor, this child is null
+	
 		//	Operands
 		Object operand1 = execute(operandNode1);
 		Object operand2 = execute(operandNode2);
@@ -122,8 +112,7 @@ public class ExpressionExecutor extends StatementExecutor
 		//	Arithmetic operators
 		//	====================
 		
-		if (ARITH_OPS.contains(nodeType))
-		{
+		if (ARITH_OPS.contains(nodeType)) {
 			if (integerNode)
 			{
 				int value1 = (Integer) operand1;
@@ -270,6 +259,7 @@ public class ExpressionExecutor extends StatementExecutor
 		}
 		
 		return 0; 		// should never get here
+		
 	}
 
 }

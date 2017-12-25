@@ -6,28 +6,13 @@ import wci.frontend.pascal.tokens.*;
 import static wci.frontend.pascal.PascalErrorCode.*;
 import static wci.frontend.Source.EOF;
 
-
-/**
- * <h1>PascalScanner</h1>
- * 
- *<p>The Pascal scanner</p>
- */
 public class PascalScanner extends Scanner {
 
-	/**
-	 * Constructor
-	 * @param source the source to be used with this scanner.
-	 */
 	public PascalScanner(Source source) 
 	{
 		super(source);
 	}
 
-	/**
-	 * Extract and return the next Pascal token from the source.
-	 * @return the next token
-	 * throws Exception if an error occurred
-	 */
 	protected Token extractToken() 
 		throws Exception 
 	{
@@ -74,10 +59,6 @@ public class PascalScanner extends Scanner {
 		
 	}
 	
-	/**
-	 * Skips whitespace characters by consuming them. A comment is whitespace.
-	 * @throws Exception
-	 */
 	protected void skipWhiteSpace() 
 		throws Exception
 	{
