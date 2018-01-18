@@ -24,6 +24,7 @@ public class StatementExecutor extends Executor
 		//	Send a message about the current source line.
 		sendSourceLineMessage(node);
 		
+		// TODO this switch has a lot of code repetition that should be re-factored
 		switch (nodeType)
 		{
 		
@@ -41,8 +42,14 @@ public class StatementExecutor extends Executor
 			LoopExecutor loopExecutor = new LoopExecutor(this);
 			return loopExecutor.execute(node);
 		}
-		case IF: {}
-		case SELECT: {}
+		case IF: {
+			IfExecutor ifExecutor = new IfExecutor(this);
+			return ifExecutor.execute(node);
+		}
+		case SELECT: {
+			SelectExecutor selectExecutor = new SelectExecutor(this);
+			return selectExecutor.execute(node);
+		}
 		case NO_OP: return null;
 					
 		default:
