@@ -27,7 +27,7 @@ public class ExpressionParser extends StatementParser
 		super(parent);
 	}
 	
-	public ICodeNode parse(Token token)
+	public ICodeNode parse(Token token) 
 		throws Exception
 	{
 		return parseExpression(token);
@@ -68,6 +68,7 @@ public class ExpressionParser extends StatementParser
 			//	as its first child
 			ICodeNodeType nodeType = REL_OPS_MAP.get(tokenType);
 			ICodeNode opNode = ICodeFactory.createICodeNode(nodeType);
+			opNode.addChild(rootNode);
 			
 			token = nextToken();				// consume the operator
 			

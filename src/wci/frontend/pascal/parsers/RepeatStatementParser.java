@@ -19,7 +19,7 @@ public class RepeatStatementParser extends StatementParser {
 		throws Exception {
 		
 		// Consume the REPEAT
-		token = nextToken(); 
+		token = nextToken();  
 		
 		// Create the LOOP and TEST nodes.
 		ICodeNode loopNode = ICodeFactory.createICodeNode(LOOP);

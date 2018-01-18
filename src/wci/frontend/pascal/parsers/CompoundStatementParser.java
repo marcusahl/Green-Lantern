@@ -18,7 +18,7 @@ public class CompoundStatementParser
 	}
 	
 	/**
-	 * Parse a compound statement
+	 * Parse a compound statement 
 	 * @param token the initial token.
 	 * @return the root node of the generated parse tree.
 	 * @throws Exception if an error occurred

@@ -8,11 +8,6 @@ import java.util.Set;
 
 import wci.intermediate.*;
 
-/**
- * <h1>ICodeNodeImpl</h1>
- * 
- *<p>An implementation of a node of the intermediate code.</p>
- */
 public class ICodeNodeImpl 
 	extends HashMap<ICodeKey, Object> 
 	implements ICodeNode 
@@ -21,10 +16,6 @@ public class ICodeNodeImpl
 	private ICodeNode parent;					// parent node
 	private ArrayList<ICodeNode> children;		// children nodes
 	
-	/**
-	 * Constructor
-	 * @param type the node type whose name will be the name of this node
-	 */
 	public ICodeNodeImpl(ICodeNodeType type)
 	{
 		this.type = type;
@@ -32,29 +23,16 @@ public class ICodeNodeImpl
 		this.children = new ArrayList<ICodeNode>();
 	}
 
-	/**
-	 * Getter
-	 * @return the node type.
-	 */
 	public ICodeNodeType getType() 
 	{
 		return type;
 	}
 
-	/**
-	 * Getter
-	 * @return the parent node.
-	 */
 	public ICodeNode getParent() 
 	{
 		return parent;
 	}
 
-	/**
-	 * Add a child node.
-	 * @param node the child node. Not added if null.
-	 * @return the child node.
-	 */
 	public ICodeNode addChild(ICodeNode node) 
 	{
 		if (node != null)
@@ -66,39 +44,22 @@ public class ICodeNodeImpl
 		return node;
 	}
 
-	/**
-	 * Getter
-	 * @return the children nodes.
-	 */
 	public ArrayList<ICodeNode> getChildren() 
 	{
 		return children;
 	}
 
-	/**
-	 * Set a node attribute
-	 * @param key the attribute key.
-	 * @param value the attribute value.
-	 */
 	public void setAttribute(ICodeKey key, Object value) 
 	{
 		put(key,value);
 	}
 
-	/**
-	 * Get the value of a node attribute.
-	 * @param key the attribute key.
-	 * @return the attribute value.
-	 */
 	public Object getAttribute(ICodeKey key) 
 	{
 		return get(key);
 	}
 
-	/**
-	 * Make a copy of this node.
-	 * @return the copy.
-	 */
+
 	public ICodeNode copy() 
 	{
 		// Create a copy with the same type.

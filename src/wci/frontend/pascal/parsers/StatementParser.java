@@ -29,7 +29,7 @@ public class StatementParser extends PascalParserTD
 		super(parent);
 	}
 		
-	public ICodeNode parse(Token token)
+	public ICodeNode parse(Token token) 
 		throws Exception
 	{
 		ICodeNode statementNode = null;
