@@ -10,13 +10,14 @@ import wci.util.*;
 
 import static wci.message.MessageType.*;
 import static wci.frontend.pascal.PascalTokenType.*;
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
 
 public class Pascal {
-	private Parser parser; // language-independent parser.
-	private Source source; // language-independent source.
-	private ICode iCode; // generated intermediate code.
-	private SymTabStack symTabStack; // generated symbol table.
-	private Backend backend; // back end.
+	private Parser parser; 
+	private Source source; 
+	private ICode iCode; 
+	private SymTabStack symTabStack; 
+	private Backend backend; 
 
 	public Pascal(String operation, String filePath, String flags) 
 	{
@@ -37,25 +38,30 @@ public class Pascal {
 			parser.parse();
 			source.close();
 			
-			iCode = parser.getICode();
-			symTabStack = parser.getSymTabStack();
+			if (parser.getErrorCount() == 0) {
 			
-			if (xref)
-			{
-				CrossReferencer crossReferencer = new CrossReferencer();
-				crossReferencer.print(symTabStack);
+				symTabStack = parser.getSymTabStack();
+				SymTabEntry programId = symTabStack.getProgramId();
+				iCode = (ICode) programId.getAttribute(ROUTINE_ICODE);
+				
+				if (xref)
+				{
+					CrossReferencer crossReferencer = new CrossReferencer();
+					crossReferencer.print(symTabStack);
+				}
+				
+				if (intermediate)
+				{
+					ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
+					treePrinter.print(iCode);
+				}
+			
+				backend.process(iCode, symTabStack);
+				
 			}
-			
-			if (intermediate)
-			{
-				ParseTreePrinter treePrinter =
-						new ParseTreePrinter(System.out);
-				treePrinter.print(iCode);
-			}
-			
-			backend.process(iCode, symTabStack);
-			
+							
 		}
+		
 		catch (Exception ex)
 		{
 			System.out.println("***** Internal translator error *****");
