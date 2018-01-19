@@ -5,9 +5,9 @@ import wci.intermediate.*;
 import wci.intermediate.icodeimpl.*;
 import wci.message.*;
 
-import static wci.message.MessageType.*;
 import static wci.backend.interpreter.RuntimeErrorCode.*;
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
+import static wci.message.MessageType.*;
 
 public class StatementExecutor extends Executor 
 {
