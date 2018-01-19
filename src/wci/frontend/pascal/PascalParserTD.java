@@ -60,18 +60,6 @@ public class PascalParserTD extends Parser {
 			ICodeNode rootNode = blockParser.parse(token, routineId);
 			iCode.setRoot(rootNode);
 			symTabStack.pop();
-//			
-//			//	Look for the BEGIN token to parse a compound statement.
-//			if (token.getType() == BEGIN)
-//			{
-//				StatementParser statementParser = new StatementParser(this);
-//				rootNode = statementParser.parse(token);
-//				token = currentToken();
-//			}
-//			else 
-//			{
-//				errorHandler.flag(token, UNEXPECTED_TOKEN, this);
-//			}
 			
 			// Look for the final period.
 			token = currentToken();
