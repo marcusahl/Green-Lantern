@@ -10,11 +10,12 @@ public class SymTabStackImpl
 {
 	private int currentNestingLevel;
 	private SymTabEntry programId;
-	
+
 	public SymTabStackImpl() 
 	{
 		this.currentNestingLevel = 0;
 		add(SymTabFactory.createSymTab(currentNestingLevel));
+		this.programId = null;
 	}
 	
 	public int getCurrentNestingLevel() 
@@ -38,7 +39,7 @@ public class SymTabStackImpl
 	}
 
 	public void setProgramId(SymTabEntry entry) {
-		programId = entry;
+		this.programId = entry;
 		
 	}
 

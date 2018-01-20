@@ -19,7 +19,7 @@ public enum PascalErrorCode
 	INVALID_EXPRESSION("Invalid expression"),
 	INVALID_FIELD("Invalid field"),
 	INVALID_FRACTION("Invalid fraction"),
-	INVALID_IDENTIFER_USAGE("Invalid identifier usage"),
+	INVALID_IDENTIFIER_USAGE("Invalid identifier usage"),
 	INVALID_INDEX_TYPE("Invalid index type"),
 	INVALID_NUMBER("Invalid number"),
 	INVALID_STATEMENT("Invalid statement"),

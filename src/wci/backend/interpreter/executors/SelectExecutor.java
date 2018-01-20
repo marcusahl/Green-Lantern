@@ -1,6 +1,7 @@
 package wci.backend.interpreter.executors;
 
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.VALUE;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.STRING_CONSTANT;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,12 +56,16 @@ public class SelectExecutor extends StatementExecutor {
 	}
 	
 	private void populateJumpTable(HashMap<Object, ICodeNode> jumpTable, ICodeNode branchNode) {
-		// The branch node has two children. The constant sub-tree, and the statement sub-tree.
+		// The branch node has two children: the constant node's sub-tree, and the statement node's sub-tree.
 		ArrayList<ICodeNode> constantList = branchNode.getChildren().get(0).getChildren();
 		ICodeNode statementNode = branchNode.getChildren().get(1);
 		
 		for (ICodeNode constantNode : constantList) {	
 			Object value = constantNode.getAttribute(VALUE);
+			if (constantNode.getType() == STRING_CONSTANT) {
+				value = ((String) value).charAt(0);
+			}
+			
 			jumpTable.put(value, statementNode);
 		}
 	}

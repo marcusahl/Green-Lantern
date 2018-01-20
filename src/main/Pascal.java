@@ -56,7 +56,7 @@ public class Pascal {
 					treePrinter.print(symTabStack);
 				}
 			
-				backend.process(iCode, symTabStack);
+				// backend.process(iCode, symTabStack);
 				
 			}
 							

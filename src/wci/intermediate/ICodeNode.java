@@ -20,4 +20,8 @@ public interface ICodeNode
 	
 	public ICodeNode copy();
 	
+	public void setTypeSpec(TypeSpec typeSpec);
+	
+	public TypeSpec getTypeSpec();
+	
 }

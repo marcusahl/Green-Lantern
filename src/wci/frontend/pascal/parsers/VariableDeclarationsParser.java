@@ -68,7 +68,7 @@ public class VariableDeclarationsParser extends DeclarationsParser {
 			TokenType tokenType = token.getType();
 			
 			if (tokenType == SEMICOLON) {
-				while (tokenType == SEMICOLON) {
+				while (token.getType() == SEMICOLON) {
 					token = nextToken();
 				}
 			}

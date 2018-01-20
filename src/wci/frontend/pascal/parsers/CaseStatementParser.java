@@ -1,6 +1,8 @@
 package wci.frontend.pascal.parsers;
 
 import static wci.frontend.pascal.PascalErrorCode.CASE_CONSTANT_REUSED;
+import static wci.frontend.pascal.PascalErrorCode.IDENTIFIER_UNDEFINED;
+import static wci.frontend.pascal.PascalErrorCode.INCOMPATIBLE_TYPES;
 import static wci.frontend.pascal.PascalErrorCode.INVALID_CONSTANT;
 import static wci.frontend.pascal.PascalErrorCode.MISSING_COLON;
 import static wci.frontend.pascal.PascalErrorCode.MISSING_COMMA;
@@ -15,14 +17,19 @@ import static wci.frontend.pascal.PascalTokenType.INTEGER;
 import static wci.frontend.pascal.PascalTokenType.MINUS;
 import static wci.frontend.pascal.PascalTokenType.OF;
 import static wci.frontend.pascal.PascalTokenType.PLUS;
-import static wci.frontend.pascal.PascalTokenType.STRING;
 import static wci.frontend.pascal.PascalTokenType.SEMICOLON;
+import static wci.frontend.pascal.PascalTokenType.STRING;
+import static wci.intermediate.icodeimpl.ICodeKeyImpl.VALUE;
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.INTEGER_CONSTANT;
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.SELECT;
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.SELECT_BRANCH;
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.SELECT_CONSTANTS;
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.STRING_CONSTANT;
-import static wci.intermediate.icodeimpl.ICodeKeyImpl.VALUE;
+import static wci.intermediate.symtabimpl.DefinitionImpl.CONSTANT;
+import static wci.intermediate.symtabimpl.DefinitionImpl.ENUMERATION_CONSTANT;
+import static wci.intermediate.symtabimpl.DefinitionImpl.UNDEFINED;
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.CONSTANT_VALUE;
+import static wci.intermediate.typeimpl.TypeFormImpl.ENUMERATION;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -32,8 +39,13 @@ import wci.frontend.Token;
 import wci.frontend.TokenType;
 import wci.frontend.pascal.PascalParserTD;
 import wci.frontend.pascal.PascalTokenType;
+import wci.intermediate.Definition;
 import wci.intermediate.ICodeFactory;
 import wci.intermediate.ICodeNode;
+import wci.intermediate.SymTabEntry;
+import wci.intermediate.TypeSpec;
+import wci.intermediate.symtabimpl.Predefined;
+import wci.intermediate.typeimpl.TypeChecker;
 
 public class CaseStatementParser extends StatementParser {
 	
@@ -45,14 +57,6 @@ public class CaseStatementParser extends StatementParser {
 		OF_SET.add(OF);
 		OF_SET.addAll(StatementParser.STMT_FOLLOW_SET);
 	}
-	private static final EnumSet<PascalTokenType> COMMA_SET =
-			CONSTANT_START_SET.clone();
-	static {
-		COMMA_SET.add(COMMA);
-		COMMA_SET.add(COLON);
-		COMMA_SET.addAll(StatementParser.STMT_START_SET);
-		COMMA_SET.addAll(StatementParser.STMT_FOLLOW_SET);
-	}
 
 	public CaseStatementParser(PascalParserTD parent) {
 		super(parent);
@@ -63,11 +67,18 @@ public class CaseStatementParser extends StatementParser {
 		
 		ICodeNode selectNode = ICodeFactory.createICodeNode(SELECT);
 		
-		// The SELECT node adopts the expression subtree as its first child
 		ExpressionParser expressionParser = new ExpressionParser(this);
-		selectNode.addChild(expressionParser.parse(token));
+		ICodeNode exprNode = expressionParser.parse(token);
+		selectNode.addChild(exprNode);
 		
-		// Synchronize at the OF.
+		TypeSpec exprType = exprNode.getTypeSpec();
+		if (!TypeChecker.isInteger(exprType) &&
+			!TypeChecker.isChar(exprType) && 
+			(exprType.getForm() != ENUMERATION)) 
+		{
+			errorHandler.flag(token, INCOMPATIBLE_TYPES, this);
+		}
+		
 		token = synchronize(OF_SET);
 		if(token.getType() == OF) {
 			token = nextToken();
@@ -76,15 +87,11 @@ public class CaseStatementParser extends StatementParser {
 			errorHandler.flag(token, MISSING_OF, this);
 		}
 		
-		// Set of CASE branch constants
 		HashSet<Object> constantSet = new HashSet<Object>();
 		
-		// Loop to parse each CASE branch until the END token
-		// or the end of the source file.
 		while (!(token instanceof EofToken) && (token.getType() != END)) {
 			
-			// The SELECT node adopts the CASE branch subtree.
-			selectNode.addChild(parseBranch(token, constantSet));
+			selectNode.addChild(parseBranch(token, constantSet, exprType));
 			
 			token = currentToken();
 			TokenType tokenType = token.getType();
@@ -107,13 +114,14 @@ public class CaseStatementParser extends StatementParser {
 		return selectNode;
 	}
 	
-	private ICodeNode parseBranch(Token token, HashSet<Object> constantSet) throws Exception {
+	private ICodeNode parseBranch(Token token, HashSet<Object> constantSet, TypeSpec exprType) 
+			throws Exception {
 		
 		ICodeNode branchNode = ICodeFactory.createICodeNode(SELECT_BRANCH);
 		ICodeNode constantNode = ICodeFactory.createICodeNode(SELECT_CONSTANTS);
 		branchNode.addChild(constantNode);
 		
-		parseConstantList(token, constantNode, constantSet);
+		parseConstantList(token, constantNode, constantSet, exprType);
 		
 		token = currentToken();
 		if (token.getType() == COLON) {
@@ -130,12 +138,22 @@ public class CaseStatementParser extends StatementParser {
 	
 	}
 	
-	private void parseConstantList(Token token, ICodeNode constantNode, HashSet<Object> constantSet) 
+	private static final EnumSet<PascalTokenType> COMMA_SET =
+			CONSTANT_START_SET.clone();
+	static {
+		COMMA_SET.add(COMMA);
+		COMMA_SET.add(COLON);
+		COMMA_SET.addAll(StatementParser.STMT_START_SET);
+		COMMA_SET.addAll(StatementParser.STMT_FOLLOW_SET);
+	}
+	
+	private void parseConstantList(Token token, ICodeNode constantNode, HashSet<Object> constantSet, 
+			TypeSpec exprType) 
 		throws Exception {
 		
 		while (CONSTANT_START_SET.contains(token.getType())) {
 			
-			constantNode.addChild(parseConstant(token, constantSet));
+			constantNode.addChild(parseConstant(token, constantSet, exprType));
 			
 			token = synchronize(COMMA_SET);
 			
@@ -148,12 +166,11 @@ public class CaseStatementParser extends StatementParser {
 		}
 	}
 	
-	private ICodeNode parseConstant(Token token, HashSet<Object> constantSet) throws Exception {
+	private ICodeNode parseConstant(Token token, HashSet<Object> constantSet, TypeSpec exprType) throws Exception {
 		
 		TokenType sign = null;
 		ICodeNode constantNode = null;
 		
-		// Synchronize at the start of a constant.
 		token = synchronize(CONSTANT_START_SET);
 		TokenType tokenType = token.getType();
 		
@@ -162,20 +179,26 @@ public class CaseStatementParser extends StatementParser {
 			token = nextToken();
 		}
 		
+		TypeSpec constantType = null;
 		switch ((PascalTokenType) token.getType()) {
 		
 			case IDENTIFIER: {
 				constantNode = parseIdentifierConstant(token, sign);
+				if (constantNode != null) {
+					constantType = constantNode.getTypeSpec();
+				}
 				break;
 			}
 			
 			case INTEGER: {
 				constantNode = parseIntegerConstant(token, sign);
+				constantType = Predefined.integerType;
 				break;
 			}
 			
 			case STRING: {
 				constantNode = parseCharacterConstant(token, sign);
+				constantType = Predefined.charType;
 				break;
 			}
 			
@@ -196,14 +219,56 @@ public class CaseStatementParser extends StatementParser {
 			}
 		}
 		
-		nextToken();
+		if (!TypeChecker.areComparisonCompatible(exprType, constantType) ) {
+			errorHandler.flag(token, INCOMPATIBLE_TYPES, this);
+		}
+		
+		token = nextToken();
+		
+//		constantNode.setTypeSpec(constantType);
 		return constantNode;
 	}
 	
-	private ICodeNode parseIdentifierConstant(Token token, TokenType sign) throws Exception {
-		// TODO Implement this. For now, just throw an error if code reaches here
-		errorHandler.flag(token, INVALID_CONSTANT, this);
-		return null;
+	private ICodeNode parseIdentifierConstant(Token token, TokenType sign) 
+		throws Exception {
+		
+		ICodeNode constantNode = null;
+		TypeSpec constantType = null;
+		
+		String name = token.getText().toLowerCase();
+		SymTabEntry id = symTabStack.lookup(name);
+		
+		if (id == null) {
+			
+			id = symTabStack.enterLocal(name);
+			id.setDefinition(UNDEFINED);
+			id.setTypeSpec(Predefined.undefinedType);
+			errorHandler.flag(token, IDENTIFIER_UNDEFINED, this);
+			return null;
+		}
+		
+		Definition defnCode = id.getDefinition();
+		
+		if ((defnCode == CONSTANT) || (defnCode == ENUMERATION_CONSTANT)) {
+			
+			Object constantValue = id.getAttribute(CONSTANT_VALUE);
+			constantType = id.getTypeSpec();
+			
+			if ((sign != null) && !TypeChecker.isInteger(constantType)) {
+				errorHandler.flag(token, INVALID_CONSTANT, this);
+			}
+			
+			constantNode = ICodeFactory.createICodeNode(INTEGER_CONSTANT);
+			constantNode.setAttribute(VALUE, constantValue);
+		}
+		
+		id.appendLineNumber(token.getLineNumber());
+		
+		if (constantNode != null) {
+			constantNode.setTypeSpec(constantType);
+		}
+		
+		return constantNode;
 	}
 	
 	private ICodeNode parseIntegerConstant(Token token, TokenType sign) throws Exception {

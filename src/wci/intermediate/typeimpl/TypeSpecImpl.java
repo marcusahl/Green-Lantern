@@ -27,7 +27,8 @@ public class TypeSpecImpl
 		this.form = ARRAY;
 		
 		TypeSpec indexType = new TypeSpecImpl(SUBRANGE);
-		indexType.setAttribute(SUBRANGE_MIN_VALUE, Predefined.integerType);
+		indexType.setAttribute(SUBRANGE_BASE_TYPE, Predefined.integerType);
+		indexType.setAttribute(SUBRANGE_MIN_VALUE, 1);
 		indexType.setAttribute(SUBRANGE_MAX_VALUE, value.length());
 		
 		setAttribute(ARRAY_INDEX_TYPE, indexType);
@@ -70,13 +71,10 @@ public class TypeSpecImpl
 		return form;
 	}
 
-	@Override
 	public void setIdentifier(SymTabEntry identifier) {
-		// TODO Auto-generated method stub
-
+		this.identifier = identifier;
 	}
 
-	@Override
 	public SymTabEntry getIdentifier() {
 		return identifier;
 	}

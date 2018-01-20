@@ -4,6 +4,9 @@ import wci.frontend.Token;
 import wci.frontend.pascal.PascalParserTD;
 import wci.intermediate.ICodeFactory;
 import wci.intermediate.ICodeNode;
+import wci.intermediate.TypeSpec;
+import wci.intermediate.symtabimpl.Predefined;
+import wci.intermediate.typeimpl.TypeChecker;
 
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.*;
 import static wci.frontend.pascal.PascalTokenType.*;
@@ -18,26 +21,27 @@ public class RepeatStatementParser extends StatementParser {
 	public ICodeNode parse(Token token)
 		throws Exception {
 		
-		// Consume the REPEAT
 		token = nextToken();  
 		
-		// Create the LOOP and TEST nodes.
 		ICodeNode loopNode = ICodeFactory.createICodeNode(LOOP);
 		ICodeNode testNode = ICodeFactory.createICodeNode(TEST);
 		
-		// Parse the statement list terminated by the UNTIL token
-		// The LOOP node is the parent of the statement subtree
 		StatementParser statementParser = new StatementParser(this);
 		statementParser.parseList(token, loopNode, UNTIL, MISSING_UNTIL);
 		token = currentToken();
 		
-		// Parse the expression.
-		// The TEST node adopts the expression subtree as its only child
-		// The LOOP node adopts the TEST node
 		ExpressionParser expressionParser = new ExpressionParser(this);
-		testNode.addChild(expressionParser.parse(token));
-		loopNode.addChild(testNode);
+		ICodeNode exprNode = expressionParser.parse(token);
+		testNode.addChild(exprNode);
 		
+		TypeSpec exprType = exprNode != null ? exprNode.getTypeSpec()
+											: Predefined.undefinedType;
+		
+		if (!TypeChecker.isBoolean(exprType)) {
+			errorHandler.flag(token, INCOMPATIBLE_TYPES, this);
+		}
+		
+		loopNode.addChild(testNode);
 		return loopNode;
 		
 	}
