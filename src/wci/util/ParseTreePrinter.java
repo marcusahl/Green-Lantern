@@ -15,13 +15,9 @@ import wci.intermediate.ICodeKey;
 import wci.intermediate.ICodeNode;
 import wci.intermediate.SymTabEntry;
 import wci.intermediate.SymTabStack;
+import wci.intermediate.TypeSpec;
 import wci.intermediate.icodeimpl.ICodeNodeImpl;
 
-/**
- * <h1>ParseTreePrinter</h1>
- * 
- * <p>Print a parse tree.</p>
- */
 public class ParseTreePrinter 
 {
 	private static final int INDENT_WIDTH = 4;
@@ -59,7 +55,7 @@ public class ParseTreePrinter
 	
 	public void printRoutine(SymTabEntry routineId) {
 		Definition definition = routineId.getDefinition();
-		System.out.println("\n*** " + definition.toString() + " " + routineId.getName() + "***");
+		printStream.println("\n*** " + definition.toString() + " " + routineId.getName() + "***");
 		ICode iCode = (ICode) routineId.getAttribute(ROUTINE_ICODE);
 		if (iCode.getRoot() != null) {
 			printNode((ICodeNodeImpl) iCode.getRoot());
@@ -152,7 +148,27 @@ public class ParseTreePrinter
 	
 	public void printTypeSpec(ICodeNodeImpl node)
 	{
+		TypeSpec typeSpec = node.getTypeSpec();
 		
+		if (typeSpec != null) {
+			String saveMargin = indentation;
+			indentation += indent;
+			
+			String typeName;
+			SymTabEntry typeId = typeSpec.getIdentifier();
+			
+			if (typeId != null) {
+				typeName = typeId.getName();
+			}
+			
+			else {
+				int code = typeSpec.hashCode() + typeSpec.getForm().hashCode();
+				typeName = "$anon_" + Integer.toHexString(code);
+			}
+			
+			printAttributes("TYPE_ID", typeName);
+			indentation = saveMargin;
+		}
 	}
 	
 

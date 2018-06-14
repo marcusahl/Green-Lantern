@@ -12,15 +12,17 @@ public class ICodeNodeImpl
 	extends HashMap<ICodeKey, Object> 
 	implements ICodeNode 
 {
-	private ICodeNodeType type;					// type of node
-	private ICodeNode parent;					// parent node
-	private ArrayList<ICodeNode> children;		// children nodes
+	private ICodeNodeType type;
+	private TypeSpec typeSpec;
+	private ICodeNode parent;					
+	private ArrayList<ICodeNode> children;		
 	
 	public ICodeNodeImpl(ICodeNodeType type)
 	{
 		this.type = type;
 		this.parent = null;
 		this.children = new ArrayList<ICodeNode>();
+		this.typeSpec = null;
 	}
 
 	public ICodeNodeType getType() 
@@ -81,6 +83,15 @@ public class ICodeNodeImpl
 	public String toString()
 	{
 		return type.toString();
+	}
+
+	public void setTypeSpec(TypeSpec typeSpec) {
+		this.typeSpec = typeSpec;
+		
+	}
+
+	public TypeSpec getTypeSpec() {
+		return typeSpec;
 	}
 
 }

@@ -12,13 +12,17 @@ public class SymTabEntryImpl
 	
 	private String name;									
 	private SymTab parentSymTab;								
-	private ArrayList<Integer> lineNumbers;				
+	private ArrayList<Integer> lineNumbers;		
+	private Definition definition;
+	private TypeSpec typeSpec;
 
 	public SymTabEntryImpl(String name, SymTab symTab) 
 	{
 		this.name = name;
 		this.parentSymTab = symTab;
 		this.lineNumbers = new ArrayList<Integer>();
+		this.definition = null;
+		this.typeSpec = null;
 	}
 
 	public String getName() 
@@ -49,28 +53,21 @@ public class SymTabEntryImpl
 		return get(key);
 	}
 
-	@Override
+	
 	public void setDefinition(Definition definition) {
-		// TODO Auto-generated method stub
-		
+		this.definition = definition;
 	}
 
-	@Override
 	public Definition getDefinition() {
-		// TODO Auto-generated method stub
-		return null;
+		return definition;
 	}
 
-	@Override
 	public void setTypeSpec(TypeSpec typeSpec) {
-		// TODO Auto-generated method stub
-		
+		this.typeSpec = typeSpec;
 	}
 
-	@Override
 	public TypeSpec getTypeSpec() {
-		// TODO Auto-generated method stub
-		return null;
+		return typeSpec;
 	}
 
 }

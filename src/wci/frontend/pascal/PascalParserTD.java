@@ -15,6 +15,7 @@ import wci.frontend.Parser;
 import wci.frontend.Scanner;
 import wci.frontend.Token;
 import wci.frontend.pascal.parsers.BlockParser;
+import wci.intermediate.ICode;
 import wci.intermediate.ICodeFactory;
 import wci.intermediate.ICodeNode;
 import wci.intermediate.SymTabEntry;
@@ -42,7 +43,7 @@ public class PascalParserTD extends Parser {
 		throws Exception 
 	{
 		long startTime = System.currentTimeMillis();
-		iCode = ICodeFactory.createICode();
+		ICode iCode = ICodeFactory.createICode();
 		Predefined.initialize(symTabStack);
 		
 		routineId = symTabStack.enterLocal("DummyProgramName".toLowerCase());
