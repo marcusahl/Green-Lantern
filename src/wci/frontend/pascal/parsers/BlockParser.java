@@ -29,29 +29,22 @@ public class BlockParser extends PascalParserTD {
 	{
 		DeclarationsParser declarationParser = new DeclarationsParser(this);
 		StatementParser statementParser = new StatementParser(this);
-		
-		declarationParser.parse(token);
-		
+		declarationParser.parse(token, routineId);
 		token = synchronize(StatementParser.STMT_START_SET);
 		TokenType tokenType = token.getType();
 		ICodeNode rootNode = null;
 		
 		if (tokenType == BEGIN) {
 			rootNode = statementParser.parse(token);
-		}
-		
-		else {
+		} else {
 			errorHandler.flag(token, MISSING_BEGIN, this);
-			
 			// attempt to Parse anyway, if possible
 			if (StatementParser.STMT_START_SET.contains(tokenType)) {
 				rootNode = ICodeFactory.createICodeNode(COMPOUND);
 				statementParser.parseList(token, rootNode, END, MISSING_END);
 			}
 		}
-		
 		return rootNode;
-		
 	}
 
 }
