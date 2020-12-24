@@ -19,7 +19,7 @@ import wci.intermediate.typeimpl.TypeChecker;
 
 public class AssignmentStatementParser extends StatementParser 
 {
-	
+	private boolean isFunctionTarget = false;
 	private static final EnumSet<PascalTokenType> COLON_EQUALS_SET = 
 			ExpressionParser.EXPR_START_SET.clone();
 	
@@ -40,11 +40,11 @@ public class AssignmentStatementParser extends StatementParser
 		
 		ICodeNode assignNode = ICodeFactory.createICodeNode(ASSIGN);
 		VariableParser  variableParser = new VariableParser(this);
-		ICodeNode variableNode = variableParser.parse(token);
-		TypeSpec variableType = variableNode != null ? variableNode.getTypeSpec()
+		ICodeNode targetNode = isFunctionTarget ? variableParser.parseFunctionNameTarget(token) : variableParser.parse(token);
+		TypeSpec variableType = targetNode != null ? targetNode.getTypeSpec()
 												  : Predefined.undefinedType;
 		
-		assignNode.addChild(variableNode);
+		assignNode.addChild(targetNode);
 		
 		token = synchronize(COLON_EQUALS_SET);
 		if (token.getType() == COLON_EQUALS)
@@ -69,6 +69,11 @@ public class AssignmentStatementParser extends StatementParser
 		
 		assignNode.setTypeSpec(variableType);
 		return assignNode;
+	}
+
+	public ICodeNode parseFunctionNameAssignment(Token token) throws Exception {
+		isFunctionTarget = true;
+		return parse(token);
 	}
 
 }

@@ -16,10 +16,7 @@ import static wci.frontend.pascal.PascalTokenType.SEMICOLON;
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.ID;
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.FIELD;
 import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.SUBSCRIPTS;
-import static wci.intermediate.symtabimpl.DefinitionImpl.UNDEFINED;
-import static wci.intermediate.symtabimpl.DefinitionImpl.VALUE_PARM;
-import static wci.intermediate.symtabimpl.DefinitionImpl.VARIABLE;
-import static wci.intermediate.symtabimpl.DefinitionImpl.VAR_PARM;
+import static wci.intermediate.symtabimpl.DefinitionImpl.*;
 import static wci.intermediate.typeimpl.TypeFormImpl.ARRAY;
 import static wci.intermediate.typeimpl.TypeFormImpl.RECORD;
 import static wci.intermediate.typeimpl.TypeKeyImpl.ARRAY_ELEMENT_TYPE;
@@ -44,7 +41,8 @@ import wci.intermediate.symtabimpl.Predefined;
 import wci.intermediate.typeimpl.TypeChecker;
 
 public class VariableParser extends StatementParser {
-	
+
+	private boolean isFunctionTarget = false;
 	private static final EnumSet<PascalTokenType> SUBSCRIPT_FIELD_START_SET =
 			EnumSet.of(LEFT_BRACKET, DOT);
 	
@@ -66,12 +64,21 @@ public class VariableParser extends StatementParser {
 		return parse(token, variableId);
 	
 	}
+
+	public ICodeNode parseFunctionNameTarget(Token token) throws Exception {
+		isFunctionTarget = true;
+		return parse(token);
+	}
 	
 	public ICodeNode parse(Token token, SymTabEntry variableId) 
 		throws Exception {
 		
 		Definition defnCode = variableId.getDefinition();
-		if ((defnCode != VARIABLE) && (defnCode != VALUE_PARM) && (defnCode != VAR_PARM)) {
+		if (defnCode != VARIABLE
+			&& defnCode != VALUE_PARM
+			&& defnCode != VAR_PARM
+			&& (!isFunctionTarget || defnCode != FUNCTION)
+		) {
 			errorHandler.flag(token, INVALID_IDENTIFIER_USAGE, this);
 		}
 		
@@ -81,22 +88,23 @@ public class VariableParser extends StatementParser {
 		
 		token = nextToken();
 		TypeSpec variableType = variableId.getTypeSpec();
-		
-		// Parsing array subscripts or record fields
-		while(SUBSCRIPT_FIELD_START_SET.contains(token.getType())) {
-			ICodeNode subFieldNode = token.getType() == LEFT_BRACKET
-													 ? parseSubscripts(variableType)
-													 : parseField(variableType);
 
-			token = currentToken();
-		
-			variableType = subFieldNode.getTypeSpec();
-			variableNode.addChild(subFieldNode);
+		if (!isFunctionTarget) {
+			// Parsing array subscripts or record fields
+			while(SUBSCRIPT_FIELD_START_SET.contains(token.getType())) {
+				ICodeNode subFieldNode = token.getType() == LEFT_BRACKET
+						? parseSubscripts(variableType)
+						: parseField(variableType);
+
+				token = currentToken();
+
+				variableType = subFieldNode.getTypeSpec();
+				variableNode.addChild(subFieldNode);
+			}
 		}
-		
+
 		variableNode.setTypeSpec(variableType);
 		return variableNode;
-		
 	}
 	
 	private static final EnumSet<PascalTokenType> RIGHT_BRACKET_SET = 

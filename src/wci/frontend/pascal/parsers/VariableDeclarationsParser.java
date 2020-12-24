@@ -10,6 +10,8 @@ import static wci.frontend.pascal.PascalTokenType.COMMA;
 import static wci.frontend.pascal.PascalTokenType.END;
 import static wci.frontend.pascal.PascalTokenType.IDENTIFIER;
 import static wci.frontend.pascal.PascalTokenType.SEMICOLON;
+import static wci.intermediate.symtabimpl.DefinitionImpl.*;
+
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -61,9 +63,7 @@ public class VariableDeclarationsParser extends DeclarationsParser {
 		token = synchronize(IDENTIFIER_SET);
 		
 		while (token.getType() == IDENTIFIER ) {
-			
-			parseIdentifierSublist(token);
-			
+			parseIdentifierSublist(token, IDENTIFIER_FOLLOW_SET, COMMA_SET);
 			token = currentToken();
 			TokenType tokenType = token.getType();
 			
@@ -75,50 +75,45 @@ public class VariableDeclarationsParser extends DeclarationsParser {
 			
 			else if (NEXT_START_SET.contains(tokenType)) {
 				errorHandler.flag(token, MISSING_SEMICOLON, this);
-				
 			}
-			
 			token = synchronize(IDENTIFIER_SET);
 		}
-		
 	}
 	
-	protected ArrayList<SymTabEntry> parseIdentifierSublist(Token token) 
-		throws Exception {
+	protected ArrayList<SymTabEntry> parseIdentifierSublist(
+		Token token,
+		EnumSet<PascalTokenType> followSet,
+		EnumSet<PascalTokenType> commaSet
+		) throws Exception {
 		
 		ArrayList<SymTabEntry> sublist = new ArrayList<SymTabEntry>();
-		
 		do {
 			token = synchronize(IDENTIFIER_START_SET);
 			SymTabEntry id = parseIdentifier(token);
 			
-			if (id != null) {
-				sublist.add(id);
-			}
+			if (id != null) sublist.add(id);
 			
-			token = synchronize(COMMA_SET);
+			token = synchronize(commaSet);
 			TokenType tokenType = token.getType();
 			
 			if (tokenType == COMMA) {
 				token = nextToken();
-				
-				if (IDENTIFIER_FOLLOW_SET.contains(token.getType())) {
+				if (followSet.contains(token.getType())) {
 					errorHandler.flag(token, MISSING_IDENTIFIER, this);
 				}
 			}
 			else if (IDENTIFIER_START_SET.contains(token.getType())) {
 				errorHandler.flag(token, MISSING_COMMA, this);
 			}
-		} while (!IDENTIFIER_FOLLOW_SET.contains(token.getType()));
+		} while (!followSet.contains(token.getType()));
 		
-		TypeSpec type = parseTypeSpec(token);
-		
-		for (SymTabEntry variableId : sublist) {
-			variableId.setTypeSpec(type);
+		if (definition != PROGRAM_PARM) {
+			TypeSpec type = parseTypeSpec(token);
+			for (SymTabEntry variableId : sublist) {
+				variableId.setTypeSpec(type);
+			}
 		}
-		
 		return sublist;
-		
 	}
 	
 	private SymTabEntry parseIdentifier(Token token) 
@@ -151,7 +146,7 @@ public class VariableDeclarationsParser extends DeclarationsParser {
 		
 	}
 
-	private TypeSpec parseTypeSpec(Token token) 
+	protected TypeSpec parseTypeSpec(Token token) 
 		throws Exception {
 		
 		token = synchronize(COLON_SET);

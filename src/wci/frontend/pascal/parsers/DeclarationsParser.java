@@ -4,13 +4,16 @@ import java.util.EnumSet;
 
 import wci.frontend.Scanner;
 import wci.frontend.Token;
+import wci.frontend.TokenType;
 import wci.frontend.pascal.PascalParserTD;
 import wci.frontend.pascal.PascalTokenType;
+import wci.intermediate.ICodeNode;
+import wci.intermediate.SymTabEntry;
 
 import static wci.frontend.pascal.PascalTokenType.*;
 import static wci.intermediate.symtabimpl.DefinitionImpl.VARIABLE;
 
-public class DeclarationsParser extends BlockParser {
+public class DeclarationsParser extends PascalParserTD {
 	
 	static final EnumSet<PascalTokenType> DECLARATION_START_SET = 
 			EnumSet.of(CONST, TYPE, VAR, PROCEDURE, FUNCTION, BEGIN);
@@ -33,7 +36,7 @@ public class DeclarationsParser extends BlockParser {
 		ROUTINE_START_SET.remove(VAR);
 	}
 	
-	public void parse(Token token) 
+	public SymTabEntry parse(Token token, SymTabEntry parentId) 
 			throws Exception 
 		{
 			token = synchronize(DECLARATION_START_SET);
@@ -65,6 +68,27 @@ public class DeclarationsParser extends BlockParser {
 			}
 			
 			token = synchronize(ROUTINE_START_SET);
+			TokenType tokenType = token.getType();
+			
+			while ((tokenType == PROCEDURE) || (tokenType == FUNCTION)) {
+				DeclaredRoutineParser routineParser = new DeclaredRoutineParser(this);
+				routineParser.parse(token, parentId);
+				
+				token = currentToken();
+				
+				// TODO look to remove this if statement
+				if (token.getType() == SEMICOLON) {
+					while (token.getType() == SEMICOLON) {
+						token = nextToken();
+					}
+				}
+				
+				token = synchronize(ROUTINE_START_SET);
+				tokenType = token.getType();
+			}
+			
+			return null;
+			
 		}
 
 	public DeclarationsParser(Scanner scanner) {
