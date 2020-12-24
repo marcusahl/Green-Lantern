@@ -55,7 +55,7 @@ public class ParseTreePrinter
 	
 	public void printRoutine(SymTabEntry routineId) {
 		Definition definition = routineId.getDefinition();
-		printStream.println("\n*** " + definition.toString() + " " + routineId.getName() + "***");
+		printStream.println("\n*** " + definition.toString() + " " + routineId.getName() + " ***\n");
 		ICode iCode = (ICode) routineId.getAttribute(ROUTINE_ICODE);
 		if (iCode.getRoot() != null) {
 			printNode((ICodeNodeImpl) iCode.getRoot());
