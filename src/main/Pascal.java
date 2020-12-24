@@ -17,15 +17,29 @@ public class Pascal {
 	private Source source; 
 	private ICode iCode; 
 	private SymTabStack symTabStack; 
-	private Backend backend; 
+	private Backend backend;
+
+	// FLAGS
+	private boolean intermediate; // If intermediate code should be printed
+	private boolean xref; // If the cross-reference listing should be printed
+	private boolean lines; // If source line tracing should be printed
+	private boolean assign; // If value assign tracing should printed
+	private boolean fetch; // If value fetch tracing should be printed
+	private boolean call; // If routine call tracing should be printed
+	private boolean returnn; // If routine return tracing should be printed
 
 	public Pascal(String operation, String filePath, String flags) 
 	{
 		try
 		{
-			boolean intermediate = flags.indexOf('i') > -1; 
-			boolean xref		 = flags.indexOf('x') > -1; 
-			
+			intermediate = flags.indexOf('i') > -1;
+			xref = flags.indexOf('x') > -1;
+			lines = flags.indexOf('l') > -1;
+			assign = flags.indexOf('a') > -1;
+			fetch = flags.indexOf('f') > -1;
+			call = flags.indexOf('c') > -1;
+			returnn = flags.indexOf('r') > -1;
+
 			source = new Source(new BufferedReader(new FileReader(filePath)));
 			source.addMessageListener(new SourceMessageListener());
 			
@@ -114,9 +128,34 @@ public class Pascal {
 	}
 	
 	private static final String SOURCE_LINE_FORMAT = "%03d %s";
-	
-	private class SourceMessageListener implements MessageListener	
-	{
+	private static final String LINE_FORMAT = ">>> AT LINE %03d\n";
+	private static final String PARSER_SUMMARY_FORMAT =
+			"\n%,20d source lines." +
+					"\n%,20d syntax errors." +
+					"\n%,20.2f seconds total parsing time.\n";
+	private static final String TOKEN_FORMAT =
+			">>> %-15s line=%03d, pos=%2d, text=\"%s\"";
+	private static final String VALUE_FORMAT =
+			">>> 			value=%s";
+	private static final int PREFIX_WIDTH = 5;
+	private static final String INTERPRETER_SUMMARY_FORMAT =
+			"\n%,20d statements exectued." +
+					"\n%,20d runtime errors" +
+					"\n%,20.2f seconds total execution time.\n";
+	private static final String COMPILER_SUMMARY_FORMAT =
+			"\n%,20d instructions generated." +
+					"\n%,20.2f seconds total code generation time.\n";
+	private static final String ASSIGN_FORMAT =
+			" >>> LINE %03d: %s = %s\n";
+	private static final String FETCH_FORMAT =
+			" >>> LINE %03d: %s : %s\n";
+	private static final String CALL_FORMAT =
+			" >>> LINE %03d: CALL %s\n";
+	private static final String RETURN_FORMAT =
+			" >>> LINE %03d: RETURN FROM %s\n";
+
+	private class SourceMessageListener implements MessageListener {
+
 		public SourceMessageListener() {};
 		public void messageReceived(Message message) 
 		{
@@ -142,16 +181,6 @@ public class Pascal {
 			}
 		}
 	}
-	
-	private static final String PARSER_SUMMARY_FORMAT = 
-			"\n%,20d source lines." + 
-			"\n%,20d syntax errors." + 
-			"\n%,20.2f seconds total parsing time.\n";
-	private static final String TOKEN_FORMAT =
-			">>> %-15s line=%03d, pos=%2d, text=\"%s\"";
-	private static final String VALUE_FORMAT = 
-			">>> 			value=%s";
-	private static final int PREFIX_WIDTH = 5;
 	
 	private class ParserMessageListener implements MessageListener
 	{
@@ -233,20 +262,7 @@ public class Pascal {
 		}
 	}
 	
-	private static final String INTERPRETER_SUMMARY_FORMAT = 
-			"\n%,20d statements exectued." + 
-			"\n%,20d runtime errors" + 
-			"\n%,20.2f seconds total execution time.\n";
-	
-	private static final String COMPILER_SUMMARY_FORMAT =
-			"\n%,20d instructions generated." + 
-			"\n%,20.2f seconds total code generation time.\n";
-	
-	private static final String ASSIGN_FORMAT =
-			" >>> LINE %03d: %s = %s\n";
-	
-	private class BackendMessageListener implements MessageListener
-	{
+	private class BackendMessageListener implements MessageListener {
 		
 		boolean firstOutputMessage = true;
 		public void messageReceived(Message message) 
@@ -255,9 +271,7 @@ public class Pascal {
 			
 			switch(type)
 			{
-				
-				case INTERPRETER_SUMMARY:
-				{
+				case INTERPRETER_SUMMARY: {
 					Number body[] = (Number[]) message.getBody();
 					int executionCount = (Integer) body[0];
 					int runtimeErrors = (Integer) body[1];
@@ -268,9 +282,7 @@ public class Pascal {
 					
 					break;
 				}
-				
-				case COMPILER_SUMMARY:
-				{
+				case COMPILER_SUMMARY: {
 					Number body[] = (Number[]) message.getBody();
 					int instructionCount = (Integer) body[0];
 					float elapsedTime = (Float) body[1];
@@ -279,25 +291,50 @@ public class Pascal {
 					
 					break;
 				}
-				
-				case ASSIGN:
-				{
-					if (firstOutputMessage)
-					{
-						System.out.println("\n===== OUTPUT =====\n");
-						firstOutputMessage = false;
+				case SOURCE_LINE: {
+					if (lines) {
+						int lineNumber = (Integer) message.getBody();
+						System.out.printf(LINE_FORMAT, lineNumber);
 					}
-					
-					Object body[] = ((Object[]) message.getBody());
-					int lineNumber = (Integer) body[0];
-					String variableName = (String) body[1];
-					Object value = body[2];
-					
-					System.out.printf(ASSIGN_FORMAT, lineNumber, variableName, value);
-					break;
-					
 				}
-				
+				case ASSIGN: {
+					if (assign) {
+						Object body[] = (Object[]) message.getBody();
+						int lineNumber = (Integer) body[0];
+						String variableName = (String) body[1];
+						Object value = (String) body[2];
+						System.out.printf(ASSIGN_FORMAT, lineNumber, variableName, value);
+					}
+					break;
+				}
+				case FETCH: {
+					if (fetch) {
+						Object body[] = (Object[]) message.getBody();
+						int lineNumber = (Integer) body[0];
+						String variableName = (String) body[1];
+						Object value = (String) body[2];
+						System.out.printf(FETCH_FORMAT, lineNumber, variableName, value);
+					}
+					break;
+				}
+				case CALL: {
+					if (call) {
+						Object body[] = (Object[]) message.getBody();
+						int lineNumber = (Integer) body[0];
+						String routineName = (String) body[1];
+						System.out.printf(CALL_FORMAT, lineNumber, routineName);
+					}
+					break;
+				}
+				case RETURN: {
+					if (returnn) {
+						Object body[] = (Object[]) message.getBody();
+						int lineNumber = (Integer) body[0];
+						String routineName = (String) body[1];
+						System.out.printf(RETURN_FORMAT, lineNumber, routineName);
+					}
+					break;
+				}
 				case RUNTIME_ERROR:
 				{
 					Object body [] = (Object []) message.getBody();

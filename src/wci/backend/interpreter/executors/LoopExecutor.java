@@ -21,8 +21,7 @@ public class LoopExecutor extends StatementExecutor {
 		boolean exitLoop = false;
 		ICodeNode exprNode = null;
 		List<ICodeNode> loopChildren = node.getChildren();
-		List<ICodeNode> testChildren = null;
-		
+
 		ExpressionExecutor expressionExecutor = new ExpressionExecutor(this);
 		StatementExecutor statementExecutor = new StatementExecutor(this);
 		
@@ -35,11 +34,6 @@ public class LoopExecutor extends StatementExecutor {
 				if (childType == TEST) {
 					if (exprNode == null) {
 						exprNode = child.getChildren().get(0);
-						testChildren = exprNode.getChildren();
-						
-						for (ICodeNode testChild : testChildren) {
-							System.out.println(testChild.getType());
-						}
 					}
 					exitLoop = (Boolean) expressionExecutor.execute(exprNode);
 				}

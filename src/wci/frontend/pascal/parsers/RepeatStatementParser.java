@@ -33,6 +33,7 @@ public class RepeatStatementParser extends StatementParser {
 		ExpressionParser expressionParser = new ExpressionParser(this);
 		ICodeNode exprNode = expressionParser.parse(token);
 		testNode.addChild(exprNode);
+		loopNode.addChild(testNode);
 		
 		TypeSpec exprType = exprNode != null ? exprNode.getTypeSpec()
 											: Predefined.undefinedType;
@@ -41,7 +42,6 @@ public class RepeatStatementParser extends StatementParser {
 			errorHandler.flag(token, INCOMPATIBLE_TYPES, this);
 		}
 		
-		loopNode.addChild(testNode);
 		return loopNode;
 		
 	}

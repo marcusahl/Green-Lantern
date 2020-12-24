@@ -37,10 +37,12 @@ public class CallParser extends StatementParser {
 		
 		return callParser.parse(token);
 	}
-	private static final EnumSet<PascalTokenType> COMMA_SET = EnumSet.of(COMMA, RIGHT_PAREN);
+	private static final EnumSet<PascalTokenType> COMMA_SET = ExpressionParser.EXPR_START_SET.clone();
 	static {
-		COMMA_SET.addAll(ExpressionParser.EXPR_START_SET);
+		COMMA_SET.add(COMMA);
+		COMMA_SET.add(RIGHT_PAREN);
 	}
+
 	protected ICodeNode parseActualParameters(
 			Token token, 
 			SymTabEntry routineId,

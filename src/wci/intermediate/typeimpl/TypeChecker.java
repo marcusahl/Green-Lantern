@@ -25,19 +25,23 @@ public class TypeChecker {
 	
 	public static boolean areComparisonCompatible(TypeSpec type1, TypeSpec type2) {
 		
-		if (!((type1 == null) || (type2 == null))) {
-			
+		if (type1 == null || type2 == null) {
+			return false;
+		}
 			type1 = type1.baseType();
 			type2 = type2.baseType();
 			TypeForm form = type1.getForm();
-			
-			return (((type1 == type2) && ((form == SCALAR) || (form == ENUMERATION))) ||  // two identical scalars or enums
-					(areBothNumbersAndAtLeastOneReal(type1, type2)) ||
-					(type1.isPascalString() && type2.isPascalString()));
-			
+
+			// Two identical scalar or enum types
+		if ((type1 == type2) && ((form == SCALAR || (form == ENUMERATION)))) {
+			return true;
 		}
-		
-		return false;
+		// One is an integer and one is real
+		else if (areBothNumbersAndAtLeastOneReal(type1, type2)) {
+			return true;
+		}
+		// Two strings
+		return type1.isPascalString() && type2.isPascalString();
 	}
 	
 	public static boolean isInteger(TypeSpec type) {
