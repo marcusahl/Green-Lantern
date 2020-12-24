@@ -8,7 +8,6 @@ import wci.backend.*;
 import wci.message.*;
 import wci.util.*;
 
-import static wci.message.MessageType.*;
 import static wci.frontend.pascal.PascalTokenType.*;
 import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
 
@@ -70,7 +69,7 @@ public class Pascal {
 					treePrinter.print(symTabStack);
 				}
 			
-				// backend.process(iCode, symTabStack);
+				backend.process(iCode, symTabStack);
 				
 			}
 							
@@ -83,7 +82,7 @@ public class Pascal {
 		}
 	}
 	
-	private static final String FLAGS = "[-ix]";
+	private static final String FLAGS = "[-ixlafcr]";
 	private static final String USAGE = "Usage: Pascal execute|comiple " + FLAGS + " <source file path> ";
 
 	public static void main(String[] args) 
@@ -264,8 +263,7 @@ public class Pascal {
 	
 	private class BackendMessageListener implements MessageListener {
 		
-		boolean firstOutputMessage = true;
-		public void messageReceived(Message message) 
+		public void messageReceived(Message message)
 		{
 			MessageType type = message.getType();
 			
@@ -296,6 +294,7 @@ public class Pascal {
 						int lineNumber = (Integer) message.getBody();
 						System.out.printf(LINE_FORMAT, lineNumber);
 					}
+					break;
 				}
 				case ASSIGN: {
 					if (assign) {

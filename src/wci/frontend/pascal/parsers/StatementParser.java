@@ -38,7 +38,6 @@ public class StatementParser extends PascalParserTD
 		ICodeNode statementNode = null;
 		
 		
-		// TODO lots of code repetition
 		// Try to make this cleaner
 		
 		switch ((PascalTokenType) token.getType())
