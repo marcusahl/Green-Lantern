@@ -301,7 +301,7 @@ public class Pascal {
 						Object body[] = (Object[]) message.getBody();
 						int lineNumber = (Integer) body[0];
 						String variableName = (String) body[1];
-						Object value = (String) body[2];
+						Object value = String.valueOf((body[2]));
 						System.out.printf(ASSIGN_FORMAT, lineNumber, variableName, value);
 					}
 					break;
@@ -311,7 +311,7 @@ public class Pascal {
 						Object body[] = (Object[]) message.getBody();
 						int lineNumber = (Integer) body[0];
 						String variableName = (String) body[1];
-						Object value = (String) body[2];
+						Object value = String.valueOf((body[2]));
 						System.out.printf(FETCH_FORMAT, lineNumber, variableName, value);
 					}
 					break;
@@ -320,7 +320,7 @@ public class Pascal {
 					if (call) {
 						Object body[] = (Object[]) message.getBody();
 						int lineNumber = (Integer) body[0];
-						String routineName = (String) body[1];
+						String routineName = String.valueOf((body[1]));
 						System.out.printf(CALL_FORMAT, lineNumber, routineName);
 					}
 					break;
@@ -329,7 +329,7 @@ public class Pascal {
 					if (returnn) {
 						Object body[] = (Object[]) message.getBody();
 						int lineNumber = (Integer) body[0];
-						String routineName = (String) body[1];
+						String routineName = String.valueOf((body[1]));
 						System.out.printf(RETURN_FORMAT, lineNumber, routineName);
 					}
 					break;
