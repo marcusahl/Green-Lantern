@@ -1,5 +1,6 @@
 package wci.intermediate.symtabimpl;
 
+import static wci.intermediate.symtabimpl.DefinitionImpl.FUNCTION;
 import static wci.intermediate.symtabimpl.DefinitionImpl.PROCEDURE;
 import static wci.intermediate.symtabimpl.RoutineCodeImpl.ABS;
 import static wci.intermediate.symtabimpl.RoutineCodeImpl.ARCTAN;
@@ -142,27 +143,30 @@ public class Predefined {
 	}
 	
 	private static void initializeStandardRoutines(SymTabStack symTabStack) {
+		// Built-in Procedures
 		readId = enterStandardRoutine(symTabStack, PROCEDURE, "read", READ);
 		readlnId = enterStandardRoutine(symTabStack, PROCEDURE, "readln", READLN);
 		writeId = enterStandardRoutine(symTabStack, PROCEDURE, "write", WRITE);
 		writelnId = enterStandardRoutine(symTabStack, PROCEDURE, "writeln", WRITELN);
-		absId = enterStandardRoutine(symTabStack, PROCEDURE, "abs", ABS);
-		arctanId = enterStandardRoutine(symTabStack, PROCEDURE, "arctan", ARCTAN);
-		chrId = enterStandardRoutine(symTabStack, PROCEDURE, "chr", CHR);
-		cosId = enterStandardRoutine(symTabStack, PROCEDURE, "cos", COS);
-		eofId = enterStandardRoutine(symTabStack, PROCEDURE, "eof", EOF);
-		eolnId = enterStandardRoutine(symTabStack, PROCEDURE, "eoln", EOLN);
-		expId = enterStandardRoutine(symTabStack, PROCEDURE, "exp", EXP);
-		lnId = enterStandardRoutine(symTabStack, PROCEDURE, "ln", LN);
-		oddId = enterStandardRoutine(symTabStack, PROCEDURE, "odd", ODD);
-		ordId = enterStandardRoutine(symTabStack, PROCEDURE, "ord", ORD);
-		preId = enterStandardRoutine(symTabStack, PROCEDURE, "pre", PRED);
-		roundId = enterStandardRoutine(symTabStack, PROCEDURE, "round", ROUND);
-		sinId = enterStandardRoutine(symTabStack, PROCEDURE, "sin", SIN);
-		sqrId = enterStandardRoutine(symTabStack, PROCEDURE, "sgr", SQR);
-		sqrtId = enterStandardRoutine(symTabStack, PROCEDURE, "sqrt", SQRT);
-		succId = enterStandardRoutine(symTabStack, PROCEDURE, "succ", SUCC);
-		truncId = enterStandardRoutine(symTabStack, PROCEDURE, "trunc", TRUNC);
+
+		// Built-in functions
+		absId = enterStandardRoutine(symTabStack, FUNCTION, "abs", ABS);
+		arctanId = enterStandardRoutine(symTabStack, FUNCTION, "arctan", ARCTAN);
+		chrId = enterStandardRoutine(symTabStack, FUNCTION, "chr", CHR);
+		cosId = enterStandardRoutine(symTabStack, FUNCTION, "cos", COS);
+		eofId = enterStandardRoutine(symTabStack, FUNCTION, "eof", EOF);
+		eolnId = enterStandardRoutine(symTabStack, FUNCTION, "eoln", EOLN);
+		expId = enterStandardRoutine(symTabStack, FUNCTION, "exp", EXP);
+		lnId = enterStandardRoutine(symTabStack, FUNCTION, "ln", LN);
+		oddId = enterStandardRoutine(symTabStack, FUNCTION, "odd", ODD);
+		ordId = enterStandardRoutine(symTabStack, FUNCTION, "ord", ORD);
+		preId = enterStandardRoutine(symTabStack, FUNCTION, "pre", PRED);
+		roundId = enterStandardRoutine(symTabStack, FUNCTION, "round", ROUND);
+		sinId = enterStandardRoutine(symTabStack, FUNCTION, "sin", SIN);
+		sqrId = enterStandardRoutine(symTabStack, FUNCTION, "sqr", SQR);
+		sqrtId = enterStandardRoutine(symTabStack, FUNCTION, "sqrt", SQRT);
+		succId = enterStandardRoutine(symTabStack, FUNCTION, "succ", SUCC);
+		truncId = enterStandardRoutine(symTabStack, FUNCTION, "trunc", TRUNC);
 	}
 	
 	private static SymTabEntry enterStandardRoutine(

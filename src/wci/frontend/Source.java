@@ -124,14 +124,48 @@ public class Source implements MessageProducer
 		}
 		
 	}
+
+	/**
+	 * @return true if at the end of the line, else return false.
+	 * @throws Exception if an error occurred.
+	 */
+	public boolean atEol()
+			throws Exception
+	{
+		return (line != null) && (currentPos == line.length());
+	}
+
+	/**
+	 * @return true if at the end of the file, else return false.
+	 * @throws Exception if an error occurred.
+	 */
+	public boolean atEof()
+			throws Exception
+	{
+		// First time?
+		if (currentPos == -2) {
+			readLine();
+		}
+
+		return line == null;
+	}
+
+	/**
+	 * Skip the rest of the current input line
+	 * by forcing the next read to read a new line.
+	 */
+	public void skipToNextLine()
+	{
+		if (line != null) {
+			currentPos = line.length() + 1;
+		}
+	}
 	
 	/**
 	 * Return the source line number
 	 * @return the current line number
-	 * @throws Exception if an error occurred
 	 */
 	protected int getLineNum()
-		throws Exception	
 	{
 		return lineNum;
 	}
@@ -139,10 +173,8 @@ public class Source implements MessageProducer
 	/**
 	 * Return the current position on the line
 	 * @return the current position
-	 * @throws Exception if an error occurred
 	 */
 	protected int getPosition()
-		throws Exception	
 	{
 		return currentPos;
 	}

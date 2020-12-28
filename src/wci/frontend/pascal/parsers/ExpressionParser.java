@@ -167,8 +167,7 @@ public class ExpressionParser extends StatementParser
 		TokenType signType = null;
 		
 		TokenType tokenType = token.getType();
-		if ((tokenType == PLUS) || (tokenType == MINUS))
-		{
+		if ((tokenType == PLUS) || (tokenType == MINUS)) {
 			signType = tokenType;
 			signToken = token;
 			token = nextToken();

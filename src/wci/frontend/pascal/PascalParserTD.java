@@ -38,7 +38,6 @@ public class PascalParserTD extends Parser {
 		throws Exception 
 	{
 		long startTime = System.currentTimeMillis();
-		ICode iCode = ICodeFactory.createICode();
 		Predefined.initialize(symTabStack);
 		
 		try
@@ -47,6 +46,7 @@ public class PascalParserTD extends Parser {
 			Token token = nextToken();
 			ProgramParser programParser = new ProgramParser(this);
 			programParser.parse(token, null);
+			token = currentToken();
 
 			// Sends the parser's summary message on the output
 			float elapsedTime = (System.currentTimeMillis() - startTime)/1000f;
