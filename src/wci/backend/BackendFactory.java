@@ -6,6 +6,7 @@ import wci.backend.interpreter.Executor;
 import wci.backend.interpreter.RuntimeStack;
 import wci.backend.interpreter.debuggerimpl.CommandLineDebugger;
 import wci.backend.interpreter.debuggerimpl.DebuggerType;
+import wci.backend.interpreter.debuggerimpl.GUIDebugger;
 import wci.intermediate.TypeSpec;
 import wci.intermediate.symtabimpl.Predefined;
 
@@ -24,7 +25,8 @@ public class BackendFactory {
 	public static Debugger createDebugger(DebuggerType type, Backend backend, RuntimeStack runtimeStack) {
 		switch (type) {
 			case COMMAND_LINE: return new CommandLineDebugger(backend, runtimeStack);
-			default: return null;
+			case GUI: return new GUIDebugger(backend, runtimeStack);
+			default: return null; // Cant be reached
 		}
 	}
 	public static Object defaultValue(TypeSpec type) {
