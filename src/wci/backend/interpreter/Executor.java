@@ -2,6 +2,7 @@ package wci.backend.interpreter;
 
 import main.Pascal;
 import wci.backend.Backend;
+import wci.backend.BackendFactory;
 import wci.backend.interpreter.executors.*;
 import wci.backend.interpreter.memorymapimpl.MemoryFactory;
 import wci.frontend.Scanner;
@@ -14,6 +15,7 @@ import wci.message.Message;
 
 import java.io.*;
 
+import static wci.backend.interpreter.debuggerimpl.DebuggerType.COMMAND_LINE;
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.ID;
 import static wci.message.MessageType.*;
 
@@ -25,17 +27,15 @@ public class Executor extends Backend {
 	protected static Scanner standardIn;
 	protected static PrintWriter standardOut;
 
+	protected Debugger debugger;
+
 	static
 	{
 		executionCount = 0;
 		runtimeStack = MemoryFactory.createRuntimeStack();
 		errorHandler = new RuntimeErrorHandler();
+		standardOut = new PrintWriter(new PrintStream(System.out));
 
-
-		try {
-			standardIn = new PascalScanner(new Source(new BufferedReader(new InputStreamReader(System.in))));
-			standardOut = new PrintWriter(new PrintStream(System.out));
-		} catch (IOException swallowed) {}
 	}
 
 	public void process(ICode iCode, SymTabStack symTabStack) throws Exception 
@@ -58,13 +58,19 @@ public class Executor extends Backend {
 
 	}
 
-	public Executor() {
-		// TODO Auto-generated constructor stub
+	public Executor(String inputPath) {
+		try {
+			standardIn = inputPath != null
+					? new PascalScanner(new Source(new BufferedReader(new FileReader(inputPath))))
+					: new PascalScanner(new Source(new BufferedReader(new InputStreamReader(System.in))));
+		} catch (IOException swallowed) {}
+		debugger = BackendFactory.createDebugger(COMMAND_LINE, this, runtimeStack);
 	}
 
 	public Executor(Executor parent)
 	{
 		super();
+		this.debugger = parent.debugger;
 	}
 
 }

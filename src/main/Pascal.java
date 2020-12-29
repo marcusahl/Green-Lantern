@@ -1,5 +1,6 @@
 package main;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 
 import wci.frontend.*;
@@ -10,6 +11,7 @@ import wci.util.*;
 
 import static wci.frontend.pascal.PascalTokenType.*;
 import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
+import static wci.message.MessageType.SOURCE_LINE;
 
 public class Pascal {
 	private Parser parser; 
@@ -27,7 +29,7 @@ public class Pascal {
 	private boolean call; // If routine call tracing should be printed
 	private boolean returnn; // If routine return tracing should be printed
 
-	public Pascal(String operation, String filePath, String flags) 
+	public Pascal(String operation, String filePath, String inputPath, String flags)
 	{
 		try
 		{
@@ -45,7 +47,7 @@ public class Pascal {
 			parser = FrontendFactory.createParser("Pascal", "top-down", source);
 			parser.addMessageListener(new ParserMessageListener());
 			
-			backend = BackendFactory.createBackend(operation);
+			backend = BackendFactory.createBackend(operation, inputPath);
 			backend.addMessageListener(new BackendMessageListener());
 			
 			parser.parse();
@@ -83,7 +85,8 @@ public class Pascal {
 	}
 	
 	private static final String FLAGS = "[-ixlafcr]";
-	private static final String USAGE = "Usage: Pascal execute|comiple " + FLAGS + " <source file path> ";
+	private static final String USAGE = "Usage: Pascal execute|comiple " + FLAGS
+			+ " <source file path>  <input file path>";
 
 	public static void main(String[] args) 
 	{
@@ -92,32 +95,42 @@ public class Pascal {
 			String operation = args[0];
 			
 			// Operation.
-			if (!(   operation.equalsIgnoreCase("compile")
-					|| operation.equalsIgnoreCase("execute")))
+			if (!(operation.equalsIgnoreCase("compile") || operation.equalsIgnoreCase("execute")))
 			{
 				throw new Exception();
 			}
 			
 			int i = 0;
-			String flags = "";
+			String flags;
 			
 			//Flags
+			StringBuilder buffer = new StringBuilder();
 			while ((++i < args.length) && (args[i].charAt(0) == '-'))
 			{
-				flags += args[i].substring(1);
+				buffer.append(args[i].substring(1));
 			}
-			
+			flags = buffer.toString();
+
+			String sourcePath;
+			String inputPath = null;
+
 			// Source path
 			if (i < args.length)
 			{
-				String path = args[i];
-				new Pascal(operation, path, flags);
-			}
-			else
-			{
+				sourcePath = args[i];
+			} else {
 				throw new Exception();
 			}
-			
+			if (++i < args.length) {
+				inputPath = args[i];
+				File inputFile = new File(inputPath);
+				if (!inputFile.exists()) {
+					String errorMessage = "Input file '" + inputPath + "' does not exist.";
+					System.out.println(errorMessage);
+					throw new Exception(errorMessage);
+				}
+			}
+			new Pascal(operation, sourcePath, inputPath, flags);
 		}
 		
 		catch (Exception ex)
@@ -155,34 +168,24 @@ public class Pascal {
 
 	private class SourceMessageListener implements MessageListener {
 
-		public SourceMessageListener() {};
+		public SourceMessageListener() {}
 		public void messageReceived(Message message) 
 		{
 			MessageType type = message.getType();
-			Object body[] = (Object [])message.getBody();
-			
-			switch (type) 
-			{
-			
-				case SOURCE_LINE: 
-				{
-					int lineNumber = (Integer) body[0];
-					String lineText = (String) body[1];
-					
-					// We use system.out.println(String.format()) over system.out.printf() here
-					// to get each line of the source code printed on a seperate line
-					
-					System.out.println(String.format(SOURCE_LINE_FORMAT, lineNumber, lineText));
-					
-					break;
-				}
+			Object[] body = (Object[]) message.getBody();
 
+			if(type == SOURCE_LINE) {
+				int lineNumber = (Integer) body[0];
+				String lineText = (String) body[1];
+
+				// We use system.out.println(String.format()) over system.out.printf() here
+				// to get each line of the source code printed on a seperate line
+				System.out.println(String.format(SOURCE_LINE_FORMAT, lineNumber, lineText));
 			}
 		}
 	}
 	
-	private class ParserMessageListener implements MessageListener
-	{
+	private class ParserMessageListener implements MessageListener {
 
 		public void messageReceived(Message message) 
 		{
@@ -192,7 +195,7 @@ public class Pascal {
 			{
 				case TOKEN:
 				{
-					Object body[] = (Object []) message.getBody();
+					Object[] body = (Object []) message.getBody();
 					int line = (Integer) body[0];
 					int position = (Integer) body[1];
 					TokenType tokenType = (TokenType) body[2];
@@ -218,7 +221,7 @@ public class Pascal {
 				
 				case SYNTAX_ERROR:
 				{
-					Object body[] = (Object []) message.getBody();
+					Object[] body = (Object []) message.getBody();
 					int lineNumber = (Integer) body[0];
 					int position = (Integer) body[1];
 					String tokenText = (String) body[2];
@@ -248,7 +251,7 @@ public class Pascal {
 			
 				case PARSER_SUMMARY: 
 				{
-					Number body[] = (Number []) message.getBody();
+					Number[] body = (Number []) message.getBody();
 					int statementCount = (Integer) body[0];
 					int syntaxErrors = (Integer) body[1];
 					float elapsedTime = (Float) body[2];
@@ -270,7 +273,7 @@ public class Pascal {
 			switch(type)
 			{
 				case INTERPRETER_SUMMARY: {
-					Number body[] = (Number[]) message.getBody();
+					Number[] body = (Number[]) message.getBody();
 					int executionCount = (Integer) body[0];
 					int runtimeErrors = (Integer) body[1];
 					float elapsedTime = (Float) body[2];
@@ -281,7 +284,7 @@ public class Pascal {
 					break;
 				}
 				case COMPILER_SUMMARY: {
-					Number body[] = (Number[]) message.getBody();
+					Number[] body = (Number[]) message.getBody();
 					int instructionCount = (Integer) body[0];
 					float elapsedTime = (Float) body[1];
 					
@@ -298,7 +301,7 @@ public class Pascal {
 				}
 				case ASSIGN: {
 					if (assign) {
-						Object body[] = (Object[]) message.getBody();
+						Object[] body = (Object[]) message.getBody();
 						int lineNumber = (Integer) body[0];
 						String variableName = (String) body[1];
 						Object value = String.valueOf((body[2]));
@@ -308,7 +311,7 @@ public class Pascal {
 				}
 				case FETCH: {
 					if (fetch) {
-						Object body[] = (Object[]) message.getBody();
+						Object[] body = (Object[]) message.getBody();
 						int lineNumber = (Integer) body[0];
 						String variableName = (String) body[1];
 						Object value = String.valueOf((body[2]));
@@ -318,7 +321,7 @@ public class Pascal {
 				}
 				case CALL: {
 					if (call) {
-						Object body[] = (Object[]) message.getBody();
+						Object[] body = (Object[]) message.getBody();
 						int lineNumber = (Integer) body[0];
 						String routineName = String.valueOf((body[1]));
 						System.out.printf(CALL_FORMAT, lineNumber, routineName);
@@ -327,7 +330,7 @@ public class Pascal {
 				}
 				case RETURN: {
 					if (returnn) {
-						Object body[] = (Object[]) message.getBody();
+						Object[] body = (Object[]) message.getBody();
 						int lineNumber = (Integer) body[0];
 						String routineName = String.valueOf((body[1]));
 						System.out.printf(RETURN_FORMAT, lineNumber, routineName);
@@ -336,7 +339,7 @@ public class Pascal {
 				}
 				case RUNTIME_ERROR:
 				{
-					Object body [] = (Object []) message.getBody();
+					Object[] body = (Object []) message.getBody();
 					String errorMessage = (String) body[0];
 					Integer lineNumber = (Integer) body[1];
 					
@@ -350,7 +353,5 @@ public class Pascal {
 				}
 			}
 		}
-		
 	}
-	
 }
