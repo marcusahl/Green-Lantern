@@ -10,6 +10,7 @@ import wci.message.*;
 import wci.util.*;
 
 import static wci.frontend.pascal.PascalTokenType.*;
+import static wci.ide.IDEControl.*;
 import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
 import static wci.message.MessageType.SOURCE_LINE;
 
@@ -142,18 +143,16 @@ public class Pascal {
 	private static final String SOURCE_LINE_FORMAT = "%03d %s";
 	private static final String LINE_FORMAT = ">>> AT LINE %03d\n";
 	private static final String PARSER_SUMMARY_FORMAT =
-			"\n%,20d source lines." +
-					"\n%,20d syntax errors." +
-					"\n%,20.2f seconds total parsing time.\n";
+			PARSER_TAG + "%,d source lines, %,d syntax errors, " +
+					"%,.2f seconds total parsing time.\n";
 	private static final String TOKEN_FORMAT =
 			">>> %-15s line=%03d, pos=%2d, text=\"%s\"";
 	private static final String VALUE_FORMAT =
 			">>> 			value=%s";
 	private static final int PREFIX_WIDTH = 5;
 	private static final String INTERPRETER_SUMMARY_FORMAT =
-			"\n%,20d statements exectued." +
-					"\n%,20d runtime errors" +
-					"\n%,20.2f seconds total execution time.\n";
+			INTERPRETER_TAG + "%,d statements executed, %,d runtime errors, " +
+					"%,.2f seconds total execution time.\n";
 	private static final String COMPILER_SUMMARY_FORMAT =
 			"\n%,20d instructions generated." +
 					"\n%,20.2f seconds total code generation time.\n";
@@ -229,17 +228,8 @@ public class Pascal {
 					
 					int spaceCount = PREFIX_WIDTH + position;
 					StringBuilder flagBuffer = new StringBuilder();
-					
-					// Spaces up to the error position
-					for (int i = 0; i < spaceCount; i++)
-					{
-						flagBuffer.append(' ');
-					}
-					
-					// A pointer to the error followed by the error message.
-					flagBuffer.append("^\n*** ").append(errorMessage);
-					
-					//Text, if any, of the bad token
+					flagBuffer.append(String.format(SYNTAX_TAG + "%d: %s", lineNumber, errorMessage));
+
 					if (tokenText != null)
 					{
 						flagBuffer.append(" [at \"").append(tokenText).append("\"]");
