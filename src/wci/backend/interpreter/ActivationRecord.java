@@ -5,10 +5,10 @@ import wci.intermediate.SymTabEntry;
 import java.util.ArrayList;
 
 public interface ActivationRecord {
-    public SymTabEntry getRoutineId();
-    public Cell getCell(String name);
-    public ArrayList getAllNames();
-    public int getNestingLevel();
-    public ActivationRecord getPredecessorRecord();
-    public ActivationRecord setPredecessorRecord(ActivationRecord ar);
+    SymTabEntry getRoutineId();
+    Cell getCell(String name);
+    ArrayList<String> getAllNames();
+    int getNestingLevel();
+    ActivationRecord getPredecessorRecord();
+    ActivationRecord setPredecessorRecord(ActivationRecord ar);
 }
